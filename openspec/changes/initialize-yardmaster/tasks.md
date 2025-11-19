@@ -1,0 +1,30 @@
+# Tasks: Initialize Yardmaster
+
+- [ ] **Project Setup** <!-- id: 0 -->
+    - [ ] Initialize Go module `github.com/alexisbeaulieu97/yard` <!-- id: 1 -->
+    - [ ] Create directory structure (`cmd`, `internal`, `pkg`) <!-- id: 2 -->
+    - [ ] Add `golangci-lint` config <!-- id: 3 -->
+- [ ] **Config & Logging** <!-- id: 4 -->
+    - [ ] Implement `internal/config` with Viper <!-- id: 5 -->
+    - [ ] Implement `internal/logging` with charmbracelet/log <!-- id: 6 -->
+    - [ ] Create `yard init` command to generate default config <!-- id: 7 -->
+- [ ] **Git Engine (Core)** <!-- id: 8 -->
+    - [ ] Implement `gitx.CloneCanonical` (clone bare/mirror) <!-- id: 9 -->
+    - [ ] Implement `gitx.EnsureWorktree` (create worktree + branch) <!-- id: 10 -->
+    - [ ] Implement `gitx.Status` (check dirty/unpushed) <!-- id: 11 -->
+    - [ ] Add integration tests for `gitx` <!-- id: 12 -->
+- [ ] **Workspace Engine** <!-- id: 13 -->
+    - [ ] Define `Ticket` and `Repo` structs in `internal/domain` <!-- id: 14 -->
+    - [ ] Implement `workspace.Create` (mkdir + metadata) <!-- id: 15 -->
+    - [ ] Implement `workspace.List` (read metadata) <!-- id: 16 -->
+    - [ ] Implement `workspace.Delete` (cleanup) <!-- id: 17 -->
+- [ ] **CLI Commands** <!-- id: 18 -->
+    - [ ] Implement `yard ticket new` <!-- id: 19 -->
+    - [ ] Implement `yard ticket list` <!-- id: 20 -->
+    - [ ] Implement `yard ticket close` <!-- id: 21 -->
+    - [ ] Implement `yard status` <!-- id: 22 -->
+- [ ] **TUI** <!-- id: 23 -->
+    - [ ] Create basic Bubble Tea model <!-- id: 24 -->
+    - [ ] Implement Ticket List view <!-- id: 25 -->
+    - [ ] Implement Ticket Detail view <!-- id: 26 -->
+    - [ ] Wire up TUI to `yard tui` command <!-- id: 27 -->
