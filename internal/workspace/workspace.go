@@ -23,7 +23,7 @@ func New(workspacesRoot string) *Engine {
 }
 
 // Create creates a new workspace directory and metadata
-func (e *Engine) Create(dirName, id, slug, branchName string, repos []domain.Repo) error {
+func (e *Engine) Create(dirName, id, branchName string, repos []domain.Repo) error {
 	safeDir, err := sanitizeDirName(dirName)
 	if err != nil {
 		return fmt.Errorf("invalid workspace directory: %w", err)
@@ -42,7 +42,6 @@ func (e *Engine) Create(dirName, id, slug, branchName string, repos []domain.Rep
 	// Create metadata file
 	workspace := domain.Workspace{
 		ID:         id,
-		Slug:       slug,
 		BranchName: branchName,
 		Repos:      repos,
 	}

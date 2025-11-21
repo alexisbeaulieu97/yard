@@ -107,19 +107,9 @@ Edit `~/.canopy/config.yaml`:
 ```yaml
 projects_root: ~/projects
 workspaces_root: ~/workspaces
-workspace_naming: "{{.ID}}__{{.Slug}}"
 ```
 
 ### Advanced Configuration
-
-#### Workspace Naming
-
-You can customize how workspace directories are named using Go templates:
-
-```yaml
-workspace_naming: "{{.ID}}"           # Result: PROJ-123
-workspace_naming: "{{.ID}}-{{.Slug}}" # Result: PROJ-123-fix-bug
-```
 
 #### Auto-Repositories (Regex)
 

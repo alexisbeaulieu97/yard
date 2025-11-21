@@ -1,7 +1,7 @@
 # core-architecture Specification
 
 ## Purpose
-TBD - created by archiving change refactor-service-initialization. Update Purpose after archive.
+Defines the core architecture patterns for Canopy including service initialization, dependency injection via App context, command registration, and project branding conventions.
 ## Requirements
 ### Requirement: Centralized Service Initialization
 The system SHALL initialize all services through a centralized App struct that manages dependencies and lifecycle.
@@ -57,7 +57,7 @@ The system SHALL be named "Canopy" with the binary named `canopy`, using forest/
 
 #### Scenario: Binary installation and invocation
 - **WHEN** a user installs the tool via `go install`
-- **THEN** the binary is named `canopy` (not `canopy` or `canopy`)
+- **THEN** the binary is named `canopy` (not `yard` or `yardmaster`)
 - **AND** all commands are invoked as `canopy <command>`
 
 #### Scenario: Configuration directory naming

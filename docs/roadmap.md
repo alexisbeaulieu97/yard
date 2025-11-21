@@ -9,10 +9,6 @@
 
 ## Phase 2: Enhanced Productivity
 **Goal**: Reduce friction and automate manual setup steps.
-- [ ] **JIRA Integration**:
-    - Fetch issue title and status from JIRA.
-    - Auto-generate slug from title.
-    - Link back to JIRA in workspace metadata.
 - [ ] **Templates**:
     - Workspace templates based on work type (e.g., "Bug", "Feature").
     - Pre-defined repo sets for specific workspace patterns (e.g., `MIDDLEWARE-*`).

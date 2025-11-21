@@ -10,7 +10,6 @@ type Repo struct {
 // Workspace represents a work item
 type Workspace struct {
 	ID         string `yaml:"id"`
-	Slug       string `yaml:"slug,omitempty"`
 	BranchName string `yaml:"branch_name,omitempty"`
 	Repos      []Repo `yaml:"repos"`
 }

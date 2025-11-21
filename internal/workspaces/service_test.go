@@ -112,7 +112,7 @@ func TestCreateWorkspace(t *testing.T) {
 	// CreateWorkspace requires repos? No, it iterates over them.
 
 	// Test creating a workspace with NO repos
-	dirName, err := svc.CreateWorkspace("TEST-EMPTY", "", "", []domain.Repo{})
+	dirName, err := svc.CreateWorkspace("TEST-EMPTY", "", []domain.Repo{})
 	if err != nil {
 		t.Fatalf("CreateWorkspace failed: %v", err)
 	}

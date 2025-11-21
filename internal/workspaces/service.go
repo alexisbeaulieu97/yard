@@ -2,13 +2,11 @@
 package workspaces
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
-	"text/template"
 
 	"github.com/alexisbeaulieu97/canopy/internal/config"
 	"github.com/alexisbeaulieu97/canopy/internal/domain"
@@ -75,28 +73,15 @@ func (s *Service) ResolveRepos(workspaceID string, requestedRepos []string) ([]d
 }
 
 // CreateWorkspace creates a new workspace directory and returns the directory name
-func (s *Service) CreateWorkspace(id, slug, branchName string, repos []domain.Repo) (string, error) {
-	// 1. Determine directory name
-	// Simplified naming: Use ID as-is.
-	// If slug is provided (legacy/optional), append it.
+func (s *Service) CreateWorkspace(id, branchName string, repos []domain.Repo) (string, error) {
 	dirName := id
 
-	if slug != "" {
-		// Keep the template logic if slug is provided, for backward compatibility or advanced usage
-		var err error
-
-		dirName, err = s.renderWorkspaceDirName(id, slug)
-		if err != nil {
-			return "", fmt.Errorf("failed to render workspace directory name: %w", err)
-		}
-	}
-
-	// 2. Determine branch name
+	// Default branch name is the workspace ID
 	if branchName == "" {
-		branchName = id // Default branch name is the workspace ID
+		branchName = id
 	}
 
-	if err := s.wsEngine.Create(dirName, id, slug, branchName, repos); err != nil {
+	if err := s.wsEngine.Create(dirName, id, branchName, repos); err != nil {
 		return "", err
 	}
 
@@ -140,40 +125,6 @@ func (s *Service) WorkspacePath(workspaceID string) (string, error) {
 	}
 
 	return "", fmt.Errorf("workspace %s not found", workspaceID)
-}
-
-func (s *Service) renderWorkspaceDirName(id, slug string) (string, error) {
-	// Default to ID if no naming pattern
-	pattern := s.config.WorkspaceNaming
-	if pattern == "" {
-		return id, nil
-	}
-
-	tmpl, err := template.New("workspace_dir").Parse(pattern)
-	if err != nil {
-		return "", err
-	}
-
-	data := struct {
-		ID   string
-		Slug string
-	}{
-		ID:   id,
-		Slug: slug,
-	}
-
-	var buf bytes.Buffer
-	if err := tmpl.Execute(&buf, data); err != nil {
-		return "", err
-	}
-
-	// Clean up result: remove trailing separators if slug was empty
-	result := buf.String()
-	result = strings.TrimSuffix(result, "__")
-	result = strings.TrimSuffix(result, "_")
-	result = strings.TrimSuffix(result, "-")
-
-	return result, nil
 }
 
 // AddRepoToWorkspace adds a repository to an existing workspace
@@ -304,17 +255,6 @@ func (s *Service) ListWorkspaces() ([]domain.Workspace, error) {
 
 // GetStatus returns the aggregate status of a workspace
 func (s *Service) GetStatus(workspaceID string) (*domain.WorkspaceStatus, error) {
-	// 1. Load workspace metadata
-	// We assume workspaceID maps to dirName for now, or we need to find dirName if they differ.
-	// In current implementation, dirName is derived from ID (and slug), so we might not know it directly if we only have ID.
-	// However, List() returns map[dirName]Workspace.
-	// If we want to support looking up by ID without knowing dirName, we still need to List() or have an index.
-	// But wait, CreateWorkspace returns dirName.
-	// If we change GetStatus to take dirName, it changes the API.
-	// Let's stick to List() for lookup if we don't know dirName, OR assume dirName == ID for simple cases.
-	// But we support custom naming.
-	// So we MUST List() to find the workspace by ID unless we enforce dirName == ID.
-	// Let's keep the List() logic for finding the workspace, but use the found workspace object directly.
 	targetWorkspace, dirName, err := s.findWorkspace(workspaceID)
 	if err != nil {
 		return nil, err

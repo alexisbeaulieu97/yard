@@ -26,7 +26,6 @@ var (
 		RunE: func(cmd *cobra.Command, args []string) error {
 			id := args[0]
 			repos, _ := cmd.Flags().GetStringSlice("repos")
-			slug, _ := cmd.Flags().GetString("slug")
 			branch, _ := cmd.Flags().GetString("branch")
 			printPath, _ := cmd.Flags().GetBool("print-path")
 
@@ -56,7 +55,7 @@ var (
 				}
 			}
 
-			dirName, err := service.CreateWorkspace(id, slug, branch, resolvedRepos)
+			dirName, err := service.CreateWorkspace(id, branch, resolvedRepos)
 			if err != nil {
 				return err
 			}
@@ -311,7 +310,6 @@ func init() {
 	workspaceRepoCmd.AddCommand(workspaceRepoRemoveCmd)
 
 	workspaceNewCmd.Flags().StringSlice("repos", []string{}, "List of repositories to include")
-	workspaceNewCmd.Flags().String("slug", "", "Slug for directory naming (optional)")
 	workspaceNewCmd.Flags().String("branch", "", "Custom branch name (optional)")
 	workspaceNewCmd.Flags().Bool("print-path", false, "Print the created workspace path to stdout")
 
