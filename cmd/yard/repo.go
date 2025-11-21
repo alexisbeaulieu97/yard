@@ -2,7 +2,9 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -76,7 +78,11 @@ var repoAddCmd = &cobra.Command{
 			entry := config.RegistryEntry{URL: url}
 			realAlias, err := registerWithPrompt(cmd, app.Config.Registry, alias, entry)
 			if err != nil {
-				return err
+				if rmErr := svc.RemoveCanonicalRepo(name, true); rmErr != nil {
+					return fmt.Errorf("registration failed: %v (rollback failed: %v)", err, rmErr)
+				}
+
+				return fmt.Errorf("registration failed: %w", err)
 			}
 			fmt.Printf("Registered repository as '%s'\n", realAlias) //nolint:forbidigo // user-facing CLI output
 		}
@@ -324,20 +330,25 @@ func registerWithPrompt(cmd *cobra.Command, registry *config.RepoRegistry, alias
 		return alias, fmt.Errorf("registry not configured")
 	}
 
-	if _, exists := registry.Resolve(alias); !exists {
-		return registerAlias(registry, alias, entry)
+	target := strings.TrimSpace(alias)
+	if target == "" {
+		return "", fmt.Errorf("alias is required")
 	}
 
-	target, err := promptAlias(cmd, alias, nextAvailableAlias(registry, alias))
-	if err != nil {
-		return "", err
-	}
+	for {
+		if _, exists := registry.Resolve(target); !exists {
+			return registerAlias(registry, target, entry)
+		}
 
-	if _, exists := registry.Resolve(target); exists && target != alias {
-		return "", fmt.Errorf("alias '%s' already exists", target)
-	}
+		suggested := nextAvailableAlias(registry, target)
 
-	return registerAlias(registry, target, entry)
+		var err error
+
+		target, err = promptAlias(cmd, target, suggested)
+		if err != nil {
+			return "", err
+		}
+	}
 }
 
 func nextAvailableAlias(registry *config.RepoRegistry, base string) string {
@@ -370,7 +381,7 @@ func promptAlias(cmd *cobra.Command, alias, suggested string) (string, error) {
 	}
 
 	input, err := reader.ReadString('\n')
-	if err != nil && err.Error() != "EOF" {
+	if err != nil && !errors.Is(err, io.EOF) {
 		return "", err
 	}
 

@@ -137,9 +137,9 @@ func (m Model) loadWorkspaceDetails(id string) tea.Cmd {
 
 		var ws *domain.Workspace
 
-		for _, w := range list {
-			if w.ID == id {
-				ws = &w
+		for i := range list {
+			if list[i].ID == id {
+				ws = &list[i]
 				break
 			}
 		}

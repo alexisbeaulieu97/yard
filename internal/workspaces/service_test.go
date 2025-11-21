@@ -67,6 +67,10 @@ func TestResolveRepos(t *testing.T) {
 		t.Fatalf("ResolveRepos failed: %v", err)
 	}
 
+	if len(repos) != 1 {
+		t.Fatalf("expected 1 repo, got %d", len(repos))
+	}
+
 	if repos[0].Name != "alias/repo" {
 		t.Errorf("expected alias/repo, got %s", repos[0].Name)
 	}

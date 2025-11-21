@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 
@@ -23,7 +24,12 @@ func New(workspacesRoot string) *Engine {
 
 // Create creates a new workspace directory and metadata
 func (e *Engine) Create(dirName, id, slug, branchName string, repos []domain.Repo) error {
-	path := filepath.Join(e.WorkspacesRoot, dirName)
+	safeDir, err := sanitizeDirName(dirName)
+	if err != nil {
+		return fmt.Errorf("invalid workspace directory: %w", err)
+	}
+
+	path := filepath.Join(e.WorkspacesRoot, safeDir)
 
 	if _, err := os.Stat(path); err == nil {
 		return fmt.Errorf("workspace already exists: %s", path)
@@ -50,7 +56,12 @@ func (e *Engine) Create(dirName, id, slug, branchName string, repos []domain.Rep
 
 // Save updates the metadata for an existing workspace directory
 func (e *Engine) Save(dirName string, workspace domain.Workspace) error {
-	path := filepath.Join(e.WorkspacesRoot, dirName)
+	safeDir, err := sanitizeDirName(dirName)
+	if err != nil {
+		return fmt.Errorf("invalid workspace directory: %w", err)
+	}
+
+	path := filepath.Join(e.WorkspacesRoot, safeDir)
 	metaPath := filepath.Join(path, "workspace.yaml")
 
 	return e.saveMetadata(metaPath, workspace)
@@ -123,7 +134,12 @@ func (e *Engine) tryLoadMetadata(dirPath string) (domain.Workspace, bool) {
 
 // Load reads the metadata for a specific workspace
 func (e *Engine) Load(dirName string) (*domain.Workspace, error) {
-	path := filepath.Join(e.WorkspacesRoot, dirName)
+	safeDir, err := sanitizeDirName(dirName)
+	if err != nil {
+		return nil, fmt.Errorf("invalid workspace directory: %w", err)
+	}
+
+	path := filepath.Join(e.WorkspacesRoot, safeDir)
 	metaPath := filepath.Join(path, "workspace.yaml")
 
 	f, err := os.Open(metaPath) //nolint:gosec // path is derived from workspace directory
@@ -149,6 +165,29 @@ func (e *Engine) Load(dirName string) (*domain.Workspace, error) {
 
 // Delete removes a workspace
 func (e *Engine) Delete(workspaceID string) error {
-	path := filepath.Join(e.WorkspacesRoot, workspaceID)
+	safeDir, err := sanitizeDirName(workspaceID)
+	if err != nil {
+		return fmt.Errorf("invalid workspace directory: %w", err)
+	}
+
+	path := filepath.Join(e.WorkspacesRoot, safeDir)
+
 	return os.RemoveAll(path)
+}
+
+func sanitizeDirName(name string) (string, error) {
+	cleaned := filepath.Clean(strings.TrimSpace(name))
+	if cleaned == "" || cleaned == "." {
+		return "", fmt.Errorf("workspace name cannot be empty")
+	}
+
+	if filepath.IsAbs(cleaned) {
+		return "", fmt.Errorf("workspace name must be relative")
+	}
+
+	if cleaned != filepath.Base(cleaned) || strings.Contains(cleaned, "..") || strings.ContainsRune(cleaned, filepath.Separator) {
+		return "", fmt.Errorf("workspace name contains invalid path elements")
+	}
+
+	return cleaned, nil
 }

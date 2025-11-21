@@ -61,60 +61,14 @@ func (s *Service) ResolveRepos(workspaceID string, requestedRepos []string) ([]d
 	var repos []domain.Repo
 
 	for _, raw := range repoNames {
-		val := strings.TrimSpace(raw)
-		if val == "" {
-			continue
+		repo, ok, err := s.resolveRepoIdentifier(raw, userRequested)
+		if err != nil {
+			return nil, err
 		}
 
-		if isLikelyURL(val) {
-			if entry, ok := s.registry.ResolveByURL(val); ok {
-				repos = append(repos, domain.Repo{
-					Name: entry.Alias,
-					URL:  entry.URL,
-				})
-
-				continue
-			}
-
-			repos = append(repos, domain.Repo{
-				Name: repoNameFromURL(val),
-				URL:  val,
-			})
-
-			continue
+		if ok {
+			repos = append(repos, repo)
 		}
-
-		if s.registry != nil {
-			if entry, ok := s.registry.Resolve(val); ok {
-				repos = append(repos, domain.Repo{
-					Name: entry.Alias,
-					URL:  entry.URL,
-				})
-
-				continue
-			}
-		}
-
-		if strings.Count(val, "/") == 1 {
-			parts := strings.Split(val, "/")
-			url := "https://github.com/" + val
-			repos = append(repos, domain.Repo{
-				Name: parts[1],
-				URL:  url,
-			})
-
-			continue
-		}
-
-		if userRequested {
-			return nil, fmt.Errorf("unknown repository '%s'. Register it first: yard repo register %s <repository-url>", val, val)
-		}
-
-		// Legacy fallback for pattern-based names without explicit URLs.
-		repos = append(repos, domain.Repo{
-			Name: val,
-			URL:  fmt.Sprintf("https://github.com/example/%s", val),
-		})
 	}
 
 	return repos, nil
@@ -418,16 +372,7 @@ func (s *Service) ListCanonicalRepos() ([]string, error) {
 
 // AddCanonicalRepo adds a new repository to the cache and returns the canonical name.
 func (s *Service) AddCanonicalRepo(url string) (string, error) {
-	// Extract name from URL
-	// Assuming URL ends with /name.git or /name
-	parts := strings.Split(url, "/")
-	if len(parts) == 0 {
-		return "", fmt.Errorf("invalid URL: %s", url)
-	}
-
-	name := parts[len(parts)-1]
-	name = strings.TrimSuffix(name, ".git")
-
+	name := repoNameFromURL(url)
 	if name == "" {
 		return "", fmt.Errorf("could not determine repo name from URL: %s", url)
 	}
@@ -566,6 +511,46 @@ func isLikelyURL(val string) bool {
 		strings.HasPrefix(val, "file://")
 }
 
+func (s *Service) resolveRepoIdentifier(raw string, userRequested bool) (domain.Repo, bool, error) {
+	val := strings.TrimSpace(raw)
+	if val == "" {
+		return domain.Repo{}, false, nil
+	}
+
+	if isLikelyURL(val) {
+		if s.registry != nil {
+			if entry, ok := s.registry.ResolveByURL(val); ok {
+				return domain.Repo{Name: entry.Alias, URL: entry.URL}, true, nil
+			}
+		}
+
+		return domain.Repo{Name: repoNameFromURL(val), URL: val}, true, nil
+	}
+
+	if s.registry != nil {
+		if entry, ok := s.registry.Resolve(val); ok {
+			return domain.Repo{Name: entry.Alias, URL: entry.URL}, true, nil
+		}
+	}
+
+	if strings.Count(val, "/") == 1 {
+		parts := strings.Split(val, "/")
+		url := "https://github.com/" + val
+
+		return domain.Repo{Name: parts[1], URL: url}, true, nil
+	}
+
+	if userRequested {
+		return domain.Repo{}, false, fmt.Errorf("unknown repository '%s'. Register it first: yard repo register %s <repository-url>", val, val)
+	}
+
+	// Legacy fallback for pattern-based names without explicit URLs.
+	return domain.Repo{
+		Name: val,
+		URL:  fmt.Sprintf("https://github.com/example/%s", val),
+	}, true, nil
+}
+
 func repoNameFromURL(url string) string {
 	// Strip scp-like prefix if present
 	if strings.Contains(url, ":") && !strings.HasPrefix(url, "http") {
@@ -574,7 +559,9 @@ func repoNameFromURL(url string) string {
 	}
 
 	parts := strings.Split(url, "/")
+
 	var name string
+
 	for i := len(parts) - 1; i >= 0; i-- {
 		if trimmed := strings.TrimSpace(parts[i]); trimmed != "" {
 			name = trimmed

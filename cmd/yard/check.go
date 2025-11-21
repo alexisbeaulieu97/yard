@@ -1,7 +1,7 @@
 package main
 
 import (
-	"os"
+	"fmt"
 
 	"github.com/spf13/cobra"
 )
@@ -27,7 +27,7 @@ var checkCmd = &cobra.Command{
 
 		if err := cfg.Validate(); err != nil {
 			app.Logger.Errorf("Configuration is invalid: %v", err)
-			os.Exit(1)
+			return fmt.Errorf("configuration is invalid: %w", err)
 		}
 
 		app.Logger.Info("Configuration is valid.")

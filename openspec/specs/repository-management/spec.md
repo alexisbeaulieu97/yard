@@ -1,7 +1,7 @@
 # repository-management Specification
 
 ## Purpose
-TBD - created by archiving change add-repository-registry. Update Purpose after archive.
+Defines how Yard discovers, registers, and manages repositories, including aliasing rules, registry behavior, resolution order, and lifecycle operations. Ensures developers can create, find, and use repos consistently while maintainers enforce naming, metadata, and access controls for reliable workspace creation.
 ## Requirements
 ### Requirement: Repository Registry
 The system SHALL maintain a registry of repository aliases at `~/.yard/repos.yaml` that maps short names to full Git URLs with optional metadata.
@@ -24,12 +24,12 @@ The system SHALL maintain a registry of repository aliases at `~/.yard/repos.yam
 - **AND** repos are cloned correctly
 
 ### Requirement: Repository Resolution Priority
-The system SHALL resolve repository identifiers using a prioritized resolution chain: URL → registry → owner/repo format → error.
+The system SHALL resolve repository identifiers using a prioritized resolution chain: registry match (by alias or URL) → explicit URL → owner/repo format → error.
 
-#### Scenario: Full URL takes precedence
-- **WHEN** user provides `--repos https://github.com/org/repo`
-- **THEN** system uses URL directly without checking registry
-- **AND** workspace is created with given URL
+#### Scenario: Registry match for URL
+- **WHEN** user provides `--repos https://github.com/org/repo` and the registry contains that URL under alias "core-api"
+- **THEN** system resolves using the registry entry and names the repo "core-api"
+- **AND** workspace is created with the registered URL
 
 #### Scenario: Registry alias resolution
 - **WHEN** user provides `--repos backend` and "backend" exists in registry
@@ -120,4 +120,3 @@ The system SHALL support optional metadata for registry entries including defaul
 - **WHEN** user runs `yard repo list-registry --tags backend`
 - **THEN** only entries with "backend" tag are shown
 - **AND** count reflects filtered results
-
