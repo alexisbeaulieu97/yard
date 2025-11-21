@@ -71,6 +71,7 @@ func setupConfig(t *testing.T) {
 	if err := os.MkdirAll(configDir, 0o750); err != nil {
 		t.Fatalf("Failed to create config dir: %v", err)
 	}
+
 	t.Setenv("HOME", testRoot)
 
 	projectsRoot := filepath.Join(testRoot, "projects")
