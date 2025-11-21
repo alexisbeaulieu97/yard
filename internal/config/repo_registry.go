@@ -26,6 +26,12 @@ type RepoRegistry struct {
 	Repos map[string]RegistryEntry `yaml:"repos"`
 }
 
+func (r *RepoRegistry) ensureMap() {
+	if r.Repos == nil {
+		r.Repos = make(map[string]RegistryEntry)
+	}
+}
+
 // LoadRepoRegistry loads the registry from disk. Missing files are treated as empty registries.
 func LoadRepoRegistry(path string) (*RepoRegistry, error) {
 	if path == "" {
@@ -64,6 +70,8 @@ func LoadRepoRegistry(path string) (*RepoRegistry, error) {
 
 // Save persists the registry to disk.
 func (r *RepoRegistry) Save() error {
+	r.ensureMap()
+
 	if r.path == "" {
 		var err error
 
@@ -91,6 +99,8 @@ func (r *RepoRegistry) Save() error {
 
 // Resolve returns a registry entry by alias if present.
 func (r *RepoRegistry) Resolve(alias string) (RegistryEntry, bool) {
+	r.ensureMap()
+
 	entry, ok := r.Repos[alias]
 	if !ok {
 		return RegistryEntry{}, false
@@ -103,6 +113,8 @@ func (r *RepoRegistry) Resolve(alias string) (RegistryEntry, bool) {
 
 // ResolveByURL returns a registry entry whose URL matches exactly.
 func (r *RepoRegistry) ResolveByURL(url string) (RegistryEntry, bool) {
+	r.ensureMap()
+
 	for alias, entry := range r.Repos {
 		if entry.URL == strings.TrimSpace(url) {
 			entry.Alias = alias
@@ -115,6 +127,8 @@ func (r *RepoRegistry) ResolveByURL(url string) (RegistryEntry, bool) {
 
 // Register adds an entry under the provided alias. Errors if alias exists unless force is true.
 func (r *RepoRegistry) Register(alias string, entry RegistryEntry, force bool) error {
+	r.ensureMap()
+
 	alias = strings.TrimSpace(alias)
 	if alias == "" {
 		return fmt.Errorf("alias is required")
@@ -138,6 +152,8 @@ func (r *RepoRegistry) Register(alias string, entry RegistryEntry, force bool) e
 
 // RegisterWithSuffix registers an entry, appending "-2" style suffixes until unique.
 func (r *RepoRegistry) RegisterWithSuffix(alias string, entry RegistryEntry) (string, error) {
+	r.ensureMap()
+
 	alias = strings.TrimSpace(alias)
 	if alias == "" {
 		return "", fmt.Errorf("alias is required")
@@ -165,6 +181,8 @@ func (r *RepoRegistry) RegisterWithSuffix(alias string, entry RegistryEntry) (st
 
 // Unregister removes an alias from the registry.
 func (r *RepoRegistry) Unregister(alias string) error {
+	r.ensureMap()
+
 	if _, exists := r.Repos[alias]; !exists {
 		return fmt.Errorf("alias '%s' not found", alias)
 	}

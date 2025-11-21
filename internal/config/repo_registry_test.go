@@ -86,6 +86,28 @@ func TestRegisterWithSuffix(t *testing.T) {
 	}
 }
 
+func TestEnsureMapDefensiveInit(t *testing.T) {
+	var registry RepoRegistry
+
+	entry := RegistryEntry{URL: "https://github.com/example/api.git"}
+
+	if err := registry.Register("api", entry, false); err != nil {
+		t.Fatalf("register failed: %v", err)
+	}
+
+	if _, ok := registry.Resolve("api"); !ok {
+		t.Fatalf("expected to resolve alias")
+	}
+
+	if _, err := registry.RegisterWithSuffix("api", entry); err != nil {
+		t.Fatalf("register with suffix failed: %v", err)
+	}
+
+	if err := registry.Unregister("api"); err != nil {
+		t.Fatalf("unregister failed: %v", err)
+	}
+}
+
 func TestDeriveAliasFromURL(t *testing.T) {
 	if got := DeriveAliasFromURL("https://github.com/org/backend-api.git"); got != "backend-api" {
 		t.Fatalf("unexpected alias: %s", got)
