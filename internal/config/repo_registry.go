@@ -101,6 +101,18 @@ func (r *RepoRegistry) Resolve(alias string) (RegistryEntry, bool) {
 	return entry, true
 }
 
+// ResolveByURL returns a registry entry whose URL matches exactly.
+func (r *RepoRegistry) ResolveByURL(url string) (RegistryEntry, bool) {
+	for alias, entry := range r.Repos {
+		if entry.URL == strings.TrimSpace(url) {
+			entry.Alias = alias
+			return entry, true
+		}
+	}
+
+	return RegistryEntry{}, false
+}
+
 // Register adds an entry under the provided alias. Errors if alias exists unless force is true.
 func (r *RepoRegistry) Register(alias string, entry RegistryEntry, force bool) error {
 	alias = strings.TrimSpace(alias)

@@ -254,17 +254,14 @@ func (m Model) handleConfirmKey(key string) (Model, tea.Cmd, bool) {
 		m.confirming = false
 		if m.actionToConfirm == "close" {
 			targetID := m.confirmingID
-			if targetID == "" {
-				if i, ok := m.list.SelectedItem().(item); ok {
-					targetID = i.id
-				}
-			}
 
 			m.confirmingID = ""
 
 			if targetID != "" {
 				return m, m.closeWorkspace(targetID), true
 			}
+
+			return m, nil, true
 		}
 
 		m.confirmingID = ""

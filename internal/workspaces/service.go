@@ -67,6 +67,15 @@ func (s *Service) ResolveRepos(workspaceID string, requestedRepos []string) ([]d
 		}
 
 		if isLikelyURL(val) {
+			if entry, ok := s.registry.ResolveByURL(val); ok {
+				repos = append(repos, domain.Repo{
+					Name: entry.Alias,
+					URL:  entry.URL,
+				})
+
+				continue
+			}
+
 			repos = append(repos, domain.Repo{
 				Name: repoNameFromURL(val),
 				URL:  val,
@@ -98,7 +107,7 @@ func (s *Service) ResolveRepos(workspaceID string, requestedRepos []string) ([]d
 		}
 
 		if userRequested {
-			return nil, fmt.Errorf("unknown repository '%s'. Use 'yard repo register %s <url>' to add it", val, val)
+			return nil, fmt.Errorf("unknown repository '%s'. Register it first: yard repo register %s <repository-url>", val, val)
 		}
 
 		// Legacy fallback for pattern-based names without explicit URLs.
@@ -565,11 +574,17 @@ func repoNameFromURL(url string) string {
 	}
 
 	parts := strings.Split(url, "/")
-	if len(parts) == 0 {
-		return url
+	var name string
+	for i := len(parts) - 1; i >= 0; i-- {
+		if trimmed := strings.TrimSpace(parts[i]); trimmed != "" {
+			name = trimmed
+			break
+		}
 	}
 
-	name := parts[len(parts)-1]
+	if name == "" {
+		return ""
+	}
 
 	return strings.TrimSuffix(name, ".git")
 }

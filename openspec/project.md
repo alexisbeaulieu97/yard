@@ -1,7 +1,7 @@
 # Project Context
 
 ## Purpose
-**Yardmaster** (binary `yard`) is a ticket-centric workspace manager for engineers. It solves the problem of juggling multiple JIRA tickets and repositories by creating per-ticket directories containing git worktrees, while keeping canonical clones centralized.
+**Canopy** (binary `canopy`) is a workspace manager for engineers working across multiple repositories. It solves the problem of juggling multiple branches and repositories by creating isolated workspace directories containing git worktrees, while keeping canonical clones centralized. Common use cases include feature development, bug fixes, experiments, or ticket-based workflows (e.g., JIRA).
 
 ## Tech Stack
 - **Language**: Go
@@ -37,10 +37,10 @@
 - Conventional Commits.
 
 ## Domain Context
-- **Canonical Repo**: A bare or mirror clone managed by Yardmaster in `projects_root`.
-- **Ticket Workspace**: A directory in `tickets_root` named after the ticket (e.g., `tickets/PROJ-123`).
-- **Worktree**: A git worktree checked out to a branch named after the ticket.
+- **Canonical Repo**: A bare or mirror clone managed by Canopy in `projects_root`.
+- **Workspace**: A directory in `workspaces_root` containing one or more repository worktrees (e.g., `workspaces/feature-auth`, `workspaces/PROJ-123`).
+- **Worktree**: A git worktree checked out to a branch, typically matching the workspace name.
 
 ## Important Constraints
 - **No shelling out to git**: Use `go-git` for core operations to ensure portability and testability.
-- **Safe Deletion**: `ticket close` must verify no unpushed/uncommitted changes before deletion.
+- **Safe Deletion**: `workspace close` must verify no unpushed/uncommitted changes before deletion.

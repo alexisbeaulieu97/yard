@@ -90,34 +90,35 @@ func (e *Engine) List() (map[string]domain.Workspace, error) {
 			continue
 		}
 
-		metaPath := filepath.Join(e.WorkspacesRoot, entry.Name(), "workspace.yaml")
-
-		f, err := os.Open(metaPath) //nolint:gosec // path is derived from workspace directory
-		if err != nil {
-			// Try legacy ticket.yaml for backward compatibility?
-			// For now, let's assume strict migration or new workspaces.
-			// Actually, let's try to read ticket.yaml if workspace.yaml missing
-			metaPath = filepath.Join(e.WorkspacesRoot, entry.Name(), "ticket.yaml")
-
-			f, err = os.Open(metaPath) //nolint:gosec // path is derived from workspace directory
-			if err != nil {
-				continue
-			}
-		}
-
-		func() {
-			defer func() { _ = f.Close() }()
-
-			var w domain.Workspace
-			if err := yaml.NewDecoder(f).Decode(&w); err != nil {
-				return
-			}
-
+		if w, ok := e.tryLoadMetadata(filepath.Join(e.WorkspacesRoot, entry.Name())); ok {
 			workspaces[entry.Name()] = w
-		}()
+		}
 	}
 
 	return workspaces, nil
+}
+
+func (e *Engine) tryLoadMetadata(dirPath string) (domain.Workspace, bool) {
+	metaPath := filepath.Join(dirPath, "workspace.yaml")
+
+	f, err := os.Open(metaPath) //nolint:gosec // path is derived from workspace directory
+	if err != nil {
+		metaPath = filepath.Join(dirPath, "ticket.yaml")
+
+		f, err = os.Open(metaPath) //nolint:gosec // path is derived from workspace directory
+		if err != nil {
+			return domain.Workspace{}, false
+		}
+	}
+
+	defer func() { _ = f.Close() }()
+
+	var w domain.Workspace
+	if err := yaml.NewDecoder(f).Decode(&w); err != nil {
+		return domain.Workspace{}, false
+	}
+
+	return w, true
 }
 
 // Load reads the metadata for a specific workspace

@@ -12,7 +12,17 @@ import (
 )
 
 func TestResolveRepos(t *testing.T) {
+	t.Parallel()
+
+	registry := config.RepoRegistry{
+		Repos: map[string]config.RegistryEntry{
+			"myorg/repo-a": {URL: "https://github.com/myorg/repo-a.git"},
+			"alias/repo":   {URL: "https://github.com/org/repo.git"},
+		},
+	}
+
 	cfg := &config.Config{
+		Registry: &registry,
 		Defaults: config.Defaults{
 			WorkspacePatterns: []config.WorkspacePattern{
 				{Pattern: "^TEST-", Repos: []string{"repo-a"}},
@@ -40,7 +50,7 @@ func TestResolveRepos(t *testing.T) {
 	}
 
 	if len(repos) != 2 {
-		t.Errorf("expected 2 repos, got %d", len(repos))
+		t.Fatalf("expected 2 repos, got %d", len(repos))
 	}
 
 	if repos[0].Name != "repo-b" {
@@ -49,6 +59,16 @@ func TestResolveRepos(t *testing.T) {
 
 	if repos[1].Name != "repo-c" {
 		t.Errorf("expected repo-c, got %s", repos[1].Name)
+	}
+
+	// URL should use alias when registry contains that URL.
+	repos, err = svc.ResolveRepos("OTHER-123", []string{"https://github.com/org/repo.git"})
+	if err != nil {
+		t.Fatalf("ResolveRepos failed: %v", err)
+	}
+
+	if repos[0].Name != "alias/repo" {
+		t.Errorf("expected alias/repo, got %s", repos[0].Name)
 	}
 }
 
@@ -106,5 +126,33 @@ func TestCreateWorkspace(t *testing.T) {
 
 	if ws.ID != "TEST-EMPTY" {
 		t.Errorf("expected ID TEST-EMPTY, got %s", ws.ID)
+	}
+}
+
+func TestRepoNameFromURL(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name string
+		url  string
+		want string
+	}{
+		{name: "standard https", url: "https://github.com/org/repo.git", want: "repo"},
+		{name: "scp style", url: "git@github.com:org/repo.git", want: "repo"},
+		{name: "trailing slash", url: "https://github.com/org/repo/", want: "repo"},
+		{name: "multiple trailing slashes", url: "https://github.com/org/repo///", want: "repo"},
+		{name: "empty input", url: "", want: ""},
+		{name: "slash only", url: "///", want: ""},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			if got := repoNameFromURL(tt.url); got != tt.want {
+				t.Fatalf("repoNameFromURL(%q) = %q, want %q", tt.url, got, tt.want)
+			}
+		})
 	}
 }
