@@ -25,7 +25,7 @@ func TestResolveRepos(t *testing.T) {
 		Registry: &registry,
 		Defaults: config.Defaults{
 			WorkspacePatterns: []config.WorkspacePattern{
-				{Pattern: "^TEST-", Repos: []string{"repo-a"}},
+				{Pattern: "^TEST-", Repos: []string{"myorg/repo-a"}},
 			},
 		},
 	}
@@ -39,8 +39,8 @@ func TestResolveRepos(t *testing.T) {
 		t.Fatalf("ResolveRepos failed: %v", err)
 	}
 
-	if len(repos) != 1 || repos[0].Name != "repo-a" {
-		t.Errorf("expected [repo-a], got %v", repos)
+	if len(repos) != 1 || repos[0].Name != "myorg/repo-a" {
+		t.Errorf("expected [myorg/repo-a], got %v", repos)
 	}
 
 	// Test case 2: Explicit repos
