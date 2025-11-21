@@ -218,7 +218,20 @@ func DeriveAliasFromURL(url string) string {
 	}
 
 	parts := strings.Split(url, "/")
-	last := parts[len(parts)-1]
+
+	var last string
+
+	for i := len(parts) - 1; i >= 0; i-- {
+		if trimmed := strings.TrimSpace(parts[i]); trimmed != "" {
+			last = trimmed
+			break
+		}
+	}
+
+	if last == "" {
+		return ""
+	}
+
 	last = strings.TrimSuffix(last, ".git")
 	last = strings.ToLower(last)
 

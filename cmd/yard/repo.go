@@ -337,11 +337,19 @@ func repoNameFromURL(url string) string {
 	}
 
 	parts := strings.Split(url, "/")
-	if len(parts) == 0 {
-		return url
+
+	var name string
+
+	for i := len(parts) - 1; i >= 0; i-- {
+		if trimmed := strings.TrimSpace(parts[i]); trimmed != "" {
+			name = trimmed
+			break
+		}
 	}
 
-	name := parts[len(parts)-1]
+	if name == "" {
+		return ""
+	}
 
 	return strings.TrimSuffix(name, ".git")
 }
