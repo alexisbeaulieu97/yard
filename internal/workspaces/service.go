@@ -208,7 +208,7 @@ func (s *Service) AddRepoToWorkspace(workspaceID, repoName string) error {
 	// Create worktree
 	branchName := workspace.BranchName
 	if branchName == "" {
-		branchName = workspace.ID // Fallback for legacy workspaces
+		return fmt.Errorf("workspace %s has no branch set in metadata", workspaceID)
 	}
 
 	worktreePath := fmt.Sprintf("%s/%s/%s", s.config.WorkspacesRoot, dirName, repo.Name)
