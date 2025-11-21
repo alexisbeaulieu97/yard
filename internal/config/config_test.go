@@ -8,7 +8,7 @@ import (
 
 func TestLoad(t *testing.T) {
 	// Create a temporary config file
-	tmpDir, err := os.MkdirTemp("", "yard-config-test")
+	tmpDir, err := os.MkdirTemp("", "canopy-config-test")
 	if err != nil {
 		t.Fatalf("failed to create temp dir: %v", err)
 	}
@@ -36,7 +36,7 @@ defaults:
 	if err := os.Setenv("HOME", tmpDir); err != nil {
 		t.Fatalf("failed to set HOME: %v", err)
 	}
-	// Note: config.Load() looks in ~/.config/yardmaster/config.yaml or ./config.yaml
+	// Note: config.Load() looks in ~/.canopy/config.yaml, ~/.config/canopy/config.yaml, or ./config.yaml
 	// We can mock the home directory or just put it in current directory?
 	// The Load() function checks current directory first.
 	// Let's try to write to ./config.yaml but we need to be careful not to overwrite existing one.
@@ -44,7 +44,7 @@ defaults:
 	// Since we are running tests, we can change working directory?
 
 	// Let's try to create the directory structure in tmpDir
-	configDir := filepath.Join(tmpDir, ".config", "yardmaster")
+	configDir := filepath.Join(tmpDir, ".config", "canopy")
 	if err := os.MkdirAll(configDir, 0o755); err != nil {
 		t.Fatalf("failed to create config dir: %v", err)
 	}

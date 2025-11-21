@@ -1,4 +1,4 @@
-// Package main implements the yard CLI.
+// Package main implements the canopy CLI.
 package main
 
 import (
@@ -8,7 +8,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/alexisbeaulieu97/yard/internal/app"
+	"github.com/alexisbeaulieu97/canopy/internal/app"
 )
 
 type contextKey string
@@ -18,8 +18,8 @@ const appContextKey contextKey = "app"
 var (
 	debug   bool
 	rootCmd = &cobra.Command{
-		Use:   "yard",
-		Short: "Ticket-centric workspaces",
+		Use:   "canopy",
+		Short: "Workspace-centric development",
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 			appInstance, err := app.New(debug)
 			if err != nil {

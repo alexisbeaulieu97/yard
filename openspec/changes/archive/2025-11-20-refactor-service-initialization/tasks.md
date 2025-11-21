@@ -7,7 +7,7 @@
 - [x] 1.4 Write unit tests for App initialization
 
 ## 2. Refactor Main Entry Point
-- [x] 2.1 Update `cmd/yard/main.go` to create App instance
+- [x] 2.1 Update `cmd/canopy/main.go` to create App instance
 - [x] 2.2 Pass App to command builders via closure or method receivers
 - [x] 2.3 Remove global `cfg` and `logger` variables
 - [x] 2.4 Update PersistentPreRunE to use App context

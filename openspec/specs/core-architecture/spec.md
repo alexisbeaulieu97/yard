@@ -26,7 +26,7 @@ Commands SHALL be registered through builder functions that retrieve dependencie
 - **AND** each command can access the App via context
 
 #### Scenario: Command execution with dependencies
-- **WHEN** a user executes `yard workspace new PROJ-123`
+- **WHEN** a user executes `canopy workspace new PROJ-123`
 - **THEN** the command handler retrieves the App from context
 - **AND** uses the App service to create the workspace
 - **AND** no duplicate service initialization occurs

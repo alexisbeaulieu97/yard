@@ -1,7 +1,7 @@
 # Implementation Tasks
 
 ## 1. Archive Infrastructure
-- [ ] 1.1 Add ArchivesRoot field to Config (default ~/.yard/archives)
+- [ ] 1.1 Add ArchivesRoot field to Config (default ~/.canopy/archives)
 - [ ] 1.2 Create archive directory on first archive operation
 - [ ] 1.3 Implement ArchiveWorkspace() in service layer
 - [ ] 1.4 Implement RestoreWorkspace() in service layer
@@ -19,10 +19,10 @@
 - [ ] 3.4 Optionally remove from archive or mark as restored
 
 ## 4. CLI Commands
-- [ ] 4.1 Implement `yard workspace archive <ID>` command
-- [ ] 4.2 Implement `yard workspace restore <ID>` command
-- [ ] 4.3 Add --archived flag to `yard workspace list`
-- [ ] 4.4 Update `yard workspace close` to suggest archiving
+- [ ] 4.1 Implement `canopy workspace archive <ID>` command
+- [ ] 4.2 Implement `canopy workspace restore <ID>` command
+- [ ] 4.3 Add --archived flag to `canopy workspace list`
+- [ ] 4.4 Update `canopy workspace close` to suggest archiving
 
 ## 5. Testing
 - [ ] 5.1 Unit tests for archive/restore operations

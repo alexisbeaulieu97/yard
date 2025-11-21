@@ -11,7 +11,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/alexisbeaulieu97/yard/internal/config"
+	"github.com/alexisbeaulieu97/canopy/internal/config"
 )
 
 var repoCmd = &cobra.Command{
@@ -438,7 +438,7 @@ func init() {
 	repoCmd.AddCommand(repoShowCmd)
 	repoCmd.AddCommand(repoPathCmd)
 
-	repoRemoveCmd.Flags().BoolP("force", "f", false, "Force removal even if used by active tickets")
+	repoRemoveCmd.Flags().BoolP("force", "f", false, "Force removal even if used by active workspaces")
 	repoAddCmd.Flags().String("alias", "", "Override derived alias when auto-registering")
 	repoAddCmd.Flags().Bool("no-register", false, "Skip auto-registration in the registry")
 	repoRegisterCmd.Flags().Bool("force", false, "Overwrite existing alias if present")

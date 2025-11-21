@@ -4,7 +4,7 @@ The system SHALL be named "Canopy" with the binary named `canopy`, using forest/
 
 #### Scenario: Binary installation and invocation
 - **WHEN** a user installs the tool via `go install`
-- **THEN** the binary is named `canopy` (not `yard` or `yardmaster`)
+- **THEN** the binary is named `canopy` (not `canopy` or `canopy`)
 - **AND** all commands are invoked as `canopy <command>`
 
 #### Scenario: Configuration directory naming
@@ -20,7 +20,7 @@ The system SHALL be named "Canopy" with the binary named `canopy`, using forest/
 #### Scenario: Documentation uses consistent branding
 - **WHEN** users read help text, README, or error messages
 - **THEN** the project is referred to as "Canopy"
-- **AND** metaphors reference canopy, forest, trees, and branches (not railroad/yard terminology)
+- **AND** metaphors reference canopy, forest, trees, and branches (not railroad/canopy terminology)
 - **AND** the metaphor explanation appears in the README introduction
 
 ## ADDED Requirements

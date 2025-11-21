@@ -17,7 +17,7 @@ var initCmd = &cobra.Command{
 			return err
 		}
 
-		configDir := filepath.Join(home, ".yard")
+		configDir := filepath.Join(home, ".canopy")
 		if err := os.MkdirAll(configDir, 0o750); err != nil {
 			return err
 		}
@@ -35,9 +35,9 @@ var initCmd = &cobra.Command{
 		defer func() { _ = f.Close() }()
 
 		// Write defaults
-		_, err = f.WriteString(`projects_root: ~/.yard/projects
-tickets_root: ~/.yard/tickets
-ticket_naming: "{{.ID}}"
+		_, err = f.WriteString(`projects_root: ~/.canopy/projects
+workspaces_root: ~/.canopy/workspaces
+workspace_naming: "{{.ID}}"
 `)
 		if err != nil {
 			return err

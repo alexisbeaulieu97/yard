@@ -8,21 +8,21 @@ The system SHALL support user-defined workspace templates that specify default r
 #### Scenario: Define template in config
 - **WHEN** user adds template to config.yaml with name, repos, and description
 - **THEN** template is available for workspace creation
-- **AND** template appears in `yard template list` output
+- **AND** template appears in `canopy template list` output
 
 #### Scenario: Create workspace from template
-- **WHEN** user runs `yard workspace new PROJ-123 --template fullstack`
+- **WHEN** user runs `canopy workspace new PROJ-123 --template fullstack`
 - **THEN** workspace is created with repositories defined in "fullstack" template
 - **AND** default branch from template is used if no explicit branch specified
 - **AND** workspace is ready for use
 
 #### Scenario: Template with explicit repos
-- **WHEN** user runs `yard workspace new PROJ-123 --template backend --repos extra-lib`
+- **WHEN** user runs `canopy workspace new PROJ-123 --template backend --repos extra-lib`
 - **THEN** workspace includes both template repos (backend, common) AND extra-lib
 - **AND** all repos are cloned successfully
 
 #### Scenario: Unknown template error
-- **WHEN** user runs `yard workspace new PROJ-123 --template nonexistent`
+- **WHEN** user runs `canopy workspace new PROJ-123 --template nonexistent`
 - **THEN** system returns error listing available templates
 - **AND** no workspace is created
 
@@ -48,13 +48,13 @@ Templates SHALL be defined in config.yaml with name, repos, optional default bra
 The system SHALL provide commands to list available templates and show template details.
 
 #### Scenario: List all templates
-- **WHEN** user runs `yard template list`
+- **WHEN** user runs `canopy template list`
 - **THEN** system displays table of template names and descriptions
 - **AND** shows repo count for each template
 - **AND** templates are sorted alphabetically
 
 #### Scenario: Show template details
-- **WHEN** user runs `yard template show fullstack`
+- **WHEN** user runs `canopy template show fullstack`
 - **THEN** system displays template name, description, repos list, and default branch
 - **AND** indicates which repos are available in registry/canonical storage
 

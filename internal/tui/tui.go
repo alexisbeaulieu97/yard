@@ -1,4 +1,4 @@
-// Package tui provides the terminal UI for yard.
+// Package tui provides the terminal UI for canopy.
 package tui
 
 import (
@@ -10,8 +10,8 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
-	"github.com/alexisbeaulieu97/yard/internal/domain"
-	"github.com/alexisbeaulieu97/yard/internal/workspaces"
+	"github.com/alexisbeaulieu97/canopy/internal/domain"
+	"github.com/alexisbeaulieu97/canopy/internal/workspaces"
 )
 
 // Styles

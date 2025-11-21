@@ -3,10 +3,10 @@
 ## ADDED Requirements
 
 ### Requirement: Repository Registry
-The system SHALL maintain a registry of repository aliases at `~/.yard/repos.yaml` that maps short names to full Git URLs with optional metadata.
+The system SHALL maintain a registry of repository aliases at `~/.canopy/repos.yaml` that maps short names to full Git URLs with optional metadata.
 
 #### Scenario: Register repository with alias
-- **WHEN** user runs `yard repo register backend https://github.com/org/backend-api`
+- **WHEN** user runs `canopy repo register backend https://github.com/org/backend-api`
 - **THEN** entry is created in repos.yaml with alias "backend" and given URL
 - **AND** subsequent workspace creations can use "backend" as shorthand
 
@@ -17,7 +17,7 @@ The system SHALL maintain a registry of repository aliases at `~/.yard/repos.yam
 - **AND** file is created on first registration
 
 #### Scenario: Use registry alias in workspace creation
-- **WHEN** user runs `yard workspace new PROJ-123 --repos backend,frontend`
+- **WHEN** user runs `canopy workspace new PROJ-123 --repos backend,frontend`
 - **THEN** system resolves "backend" and "frontend" from registry
 - **AND** workspace is created with corresponding URLs
 - **AND** repos are cloned correctly
@@ -42,26 +42,26 @@ The system SHALL resolve repository identifiers using a prioritized resolution c
 
 #### Scenario: Unknown repository error
 - **WHEN** user provides `--repos unknown` and it's not in registry or URL format
-- **THEN** system returns error suggesting `yard repo register unknown <url>`
+- **THEN** system returns error suggesting `canopy repo register unknown <url>`
 - **AND** no workspace is created
 
 ### Requirement: Auto-Registration on Clone
-The system SHALL automatically register repositories in the registry when cloned via `yard repo add`.
+The system SHALL automatically register repositories in the registry when cloned via `canopy repo add`.
 
 #### Scenario: Clone auto-registers with derived alias
-- **WHEN** user runs `yard repo add https://github.com/org/backend-api`
+- **WHEN** user runs `canopy repo add https://github.com/org/backend-api`
 - **THEN** repository is cloned to canonical storage
 - **AND** entry is created in registry with alias "backend-api"
 - **AND** user is notified of the generated alias
 
 #### Scenario: Custom alias for clone
-- **WHEN** user runs `yard repo add https://github.com/org/backend-api --alias be`
+- **WHEN** user runs `canopy repo add https://github.com/org/backend-api --alias be`
 - **THEN** repository is cloned to canonical storage
 - **AND** entry is created in registry with alias "be"
 - **AND** user can use "be" in future workspace commands
 
 #### Scenario: Skip auto-registration
-- **WHEN** user runs `yard repo add <url> --no-register`
+- **WHEN** user runs `canopy repo add <url> --no-register`
 - **THEN** repository is cloned to canonical storage
 - **AND** no registry entry is created
 - **AND** user must use full URL in future
@@ -70,7 +70,7 @@ The system SHALL automatically register repositories in the registry when cloned
 The system SHALL enforce unique aliases within the registry and handle collisions gracefully.
 
 #### Scenario: Duplicate alias error on manual registration
-- **WHEN** user runs `yard repo register backend <url>` and "backend" already exists
+- **WHEN** user runs `canopy repo register backend <url>` and "backend" already exists
 - **THEN** system returns error indicating alias is taken
 - **AND** shows existing URL for that alias
 - **AND** suggests using --force flag to overwrite
@@ -85,20 +85,20 @@ The system SHALL enforce unique aliases within the registry and handle collision
 The system SHALL provide commands to list, register, unregister, and inspect registry entries.
 
 #### Scenario: List all registry entries
-- **WHEN** user runs `yard repo list-registry`
+- **WHEN** user runs `canopy repo list-registry`
 - **THEN** system displays table of aliases, URLs, and descriptions
 - **AND** entries are sorted alphabetically by alias
 - **AND** includes entry count in output
 
 #### Scenario: Unregister alias
-- **WHEN** user runs `yard repo unregister backend`
+- **WHEN** user runs `canopy repo unregister backend`
 - **THEN** entry is removed from registry
 - **AND** repos.yaml is updated
 - **AND** confirmation message is shown
 - **AND** canonical repo remains in storage (not deleted)
 
 #### Scenario: Show registry entry details
-- **WHEN** user runs `yard repo show backend`
+- **WHEN** user runs `canopy repo show backend`
 - **THEN** system displays full details including URL, branch, description, and tags
 - **AND** indicates if canonical repo exists in storage
 
@@ -106,16 +106,16 @@ The system SHALL provide commands to list, register, unregister, and inspect reg
 The system SHALL support optional metadata for registry entries including default branch, description, and tags.
 
 #### Scenario: Register with metadata
-- **WHEN** user runs `yard repo register backend <url> --branch develop --description "Backend API"`
+- **WHEN** user runs `canopy repo register backend <url> --branch develop --description "Backend API"`
 - **THEN** entry includes URL, default_branch, and description
 - **AND** metadata is persisted to repos.yaml
 
 #### Scenario: Register with tags
-- **WHEN** user runs `yard repo register backend <url> --tags api,golang,backend`
+- **WHEN** user runs `canopy repo register backend <url> --tags api,golang,backend`
 - **THEN** entry includes tags list
 - **AND** tags can be used for filtering in future
 
 #### Scenario: Filter registry by tags
-- **WHEN** user runs `yard repo list-registry --tags backend`
+- **WHEN** user runs `canopy repo list-registry --tags backend`
 - **THEN** only entries with "backend" tag are shown
 - **AND** count reflects filtered results

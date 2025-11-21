@@ -6,19 +6,19 @@
 The system SHALL provide a `shell-init` command that outputs shell-specific function code for easy installation.
 
 #### Scenario: Generate bash shell functions
-- **WHEN** user runs `yard shell-init --shell bash`
+- **WHEN** user runs `canopy shell-init --shell bash`
 - **THEN** system outputs bash function definitions for yw and yr
 - **AND** output includes installation instructions
-- **AND** functions use yard CLI internally
+- **AND** functions use canopy CLI internally
 
 #### Scenario: Auto-detect shell
-- **WHEN** user runs `yard shell-init` without --shell flag
+- **WHEN** user runs `canopy shell-init` without --shell flag
 - **THEN** system detects shell from $SHELL environment variable
 - **AND** outputs appropriate shell-specific functions
 - **AND** returns error if shell cannot be detected
 
 #### Scenario: Install shell functions
-- **WHEN** user runs `eval "$(yard shell-init)" ` in their shell
+- **WHEN** user runs `eval "$(canopy shell-init)" ` in their shell
 - **THEN** yw and yr functions become available immediately
 - **AND** functions work correctly for current session
 

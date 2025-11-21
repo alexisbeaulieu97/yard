@@ -13,10 +13,10 @@ Every command handler duplicates the same 7-line service initialization pattern 
 ## Impact
 - Affected specs: `specs/core-architecture/spec.md`
 - Affected code:
-  - `cmd/yard/main.go` - Add App struct and initialization
-  - `cmd/yard/workspace.go` - Remove duplicated initialization (7 commands)
-  - `cmd/yard/repo.go` - Remove duplicated initialization (5 commands)
-  - `cmd/yard/tui.go` - Remove duplicated initialization
-  - `cmd/yard/status.go` - Remove duplicated initialization
-  - `cmd/yard/check.go` - Remove duplicated initialization
+  - `cmd/canopy/main.go` - Add App struct and initialization
+  - `cmd/canopy/workspace.go` - Remove duplicated initialization (7 commands)
+  - `cmd/canopy/repo.go` - Remove duplicated initialization (5 commands)
+  - `cmd/canopy/tui.go` - Remove duplicated initialization
+  - `cmd/canopy/status.go` - Remove duplicated initialization
+  - `cmd/canopy/check.go` - Remove duplicated initialization
   - All command tests - Update to use App for easier mocking

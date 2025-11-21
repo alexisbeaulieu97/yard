@@ -21,11 +21,11 @@
 - [ ] 3.5 Handle setup command failures gracefully
 
 ## 4. Add Template CLI Commands
-- [ ] 4.1 Add --template flag to `yard workspace new` command
-- [ ] 4.2 Implement `yard template list` command
+- [ ] 4.1 Add --template flag to `canopy workspace new` command
+- [ ] 4.2 Implement `canopy template list` command
 - [ ] 4.3 Add colorized output showing template name, description, repos
-- [ ] 4.4 Implement `yard template show <name>` for detailed view
-- [ ] 4.5 Add `yard template validate` to check template definitions
+- [ ] 4.4 Implement `canopy template show <name>` for detailed view
+- [ ] 4.5 Add `canopy template validate` to check template definitions
 
 ## 5. Documentation & Examples
 - [ ] 5.1 Add templates section to example config.yaml

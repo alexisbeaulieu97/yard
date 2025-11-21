@@ -26,13 +26,13 @@ The system SHALL automatically install configured git hooks to all worktrees whe
 The system SHALL provide command to update hooks in existing workspaces when configuration changes.
 
 #### Scenario: Sync hooks to existing workspace
-- **WHEN** user runs `yard workspace sync-hooks PROJ-123`
+- **WHEN** user runs `canopy workspace sync-hooks PROJ-123`
 - **THEN** all configured hooks are reinstalled to workspace repos
 - **AND** existing hooks are overwritten
 - **AND** summary shows which hooks were updated per repo
 
 #### Scenario: Dry-run hook sync
-- **WHEN** user runs `yard workspace sync-hooks PROJ-123 --dry-run`
+- **WHEN** user runs `canopy workspace sync-hooks PROJ-123 --dry-run`
 - **THEN** system shows what hooks would be installed
 - **AND** no actual changes are made
 - **AND** user can review before applying

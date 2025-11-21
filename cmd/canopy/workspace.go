@@ -8,14 +8,14 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/alexisbeaulieu97/yard/internal/domain"
-	"github.com/alexisbeaulieu97/yard/internal/workspaces"
+	"github.com/alexisbeaulieu97/canopy/internal/domain"
+	"github.com/alexisbeaulieu97/canopy/internal/workspaces"
 )
 
 var (
 	workspaceCmd = &cobra.Command{
 		Use:     "workspace",
-		Aliases: []string{"w", "ticket", "t"}, // Keep aliases for backward compatibility
+		Aliases: []string{"w"},
 		Short:   "Manage workspaces",
 	}
 

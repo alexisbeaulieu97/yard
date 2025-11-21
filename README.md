@@ -45,7 +45,7 @@ canopy repo add https://github.com/myorg/frontend.git
 
 ### 4. Create Your First Workspace
 
-Create a workspace (e.g., `PROJ-123` for a ticket, or `feature-auth` for a feature) and include specific repos:
+Create a workspace (e.g., `PROJ-123` for a workspace, or `feature-auth` for a feature) and include specific repos:
 
 ```bash
 canopy workspace new PROJ-123 --repos backend,frontend

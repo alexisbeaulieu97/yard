@@ -10,11 +10,11 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/alexisbeaulieu97/yard/internal/config"
-	"github.com/alexisbeaulieu97/yard/internal/domain"
-	"github.com/alexisbeaulieu97/yard/internal/gitx"
-	"github.com/alexisbeaulieu97/yard/internal/logging"
-	"github.com/alexisbeaulieu97/yard/internal/workspace"
+	"github.com/alexisbeaulieu97/canopy/internal/config"
+	"github.com/alexisbeaulieu97/canopy/internal/domain"
+	"github.com/alexisbeaulieu97/canopy/internal/gitx"
+	"github.com/alexisbeaulieu97/canopy/internal/logging"
+	"github.com/alexisbeaulieu97/canopy/internal/workspace"
 )
 
 // Service manages workspace operations
@@ -368,25 +368,25 @@ func (s *Service) AddCanonicalRepo(url string) (string, error) {
 
 // RemoveCanonicalRepo removes a repository from the cache
 func (s *Service) RemoveCanonicalRepo(name string, force bool) error {
-	// 1. Check if repo is used by any ticket
-	tickets, err := s.wsEngine.List()
+	// 1. Check if repo is used by any workspace
+	workspaces, err := s.wsEngine.List()
 	if err != nil {
-		return fmt.Errorf("failed to list tickets: %w", err)
+		return fmt.Errorf("failed to list workspaces: %w", err)
 	}
 
 	var usedBy []string
 
-	for _, t := range tickets {
-		for _, r := range t.Repos {
+	for _, ws := range workspaces {
+		for _, r := range ws.Repos {
 			if r.Name == name {
-				usedBy = append(usedBy, t.ID)
+				usedBy = append(usedBy, ws.ID)
 				break
 			}
 		}
 	}
 
 	if len(usedBy) > 0 && !force {
-		return fmt.Errorf("repository %s is used by tickets: %s. Use --force to remove", name, strings.Join(usedBy, ", "))
+		return fmt.Errorf("repository %s is used by workspaces: %s. Use --force to remove", name, strings.Join(usedBy, ", "))
 	}
 
 	// 2. Remove repo
@@ -510,7 +510,7 @@ func (s *Service) resolveRepoIdentifier(raw string, userRequested bool) (domain.
 	}
 
 	if userRequested {
-		return domain.Repo{}, false, fmt.Errorf("unknown repository '%s'. Register it first: yard repo register %s <repository-url>", val, val)
+		return domain.Repo{}, false, fmt.Errorf("unknown repository '%s'. Register it first: canopy repo register %s <repository-url>", val, val)
 	}
 
 	return domain.Repo{}, false, fmt.Errorf("unknown repository '%s': provide a URL or registered alias", val)

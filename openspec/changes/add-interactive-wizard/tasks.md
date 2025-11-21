@@ -17,8 +17,8 @@
 - [ ] 2.6 Allow skipping template selection
 
 ## 3. CLI Integration
-- [ ] 3.1 Add `yard workspace create` command
-- [ ] 3.2 Add --wizard flag to `yard workspace new`
+- [ ] 3.1 Add `canopy workspace create` command
+- [ ] 3.2 Add --wizard flag to `canopy workspace new`
 - [ ] 3.3 Wire wizard UI to workspace service
 - [ ] 3.4 Pass collected inputs to CreateWorkspace()
 - [ ] 3.5 Show progress spinner during creation
