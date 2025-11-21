@@ -73,7 +73,7 @@ The system SHALL be named "Canopy" with the binary named `canopy`, using forest/
 #### Scenario: Documentation uses consistent branding
 - **WHEN** users read help text, README, or error messages
 - **THEN** the project is referred to as "Canopy"
-- **AND** metaphors reference canopy, forest, trees, and branches (not railroad/canopy terminology)
+- **AND** metaphors reference canopy, forest, trees, and branches (not railroad/yard terminology)
 - **AND** the metaphor explanation appears in the README introduction
 
 ### Requirement: Canopy Metaphor Documentation

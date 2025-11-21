@@ -10,8 +10,8 @@
 ## Phase 2: Enhanced Productivity
 **Goal**: Reduce friction and automate manual setup steps.
 - [ ] **Templates**:
-    - Workspace templates based on work type (e.g., "Bug", "Feature").
-    - Pre-defined repo sets for specific workspace patterns (e.g., `MIDDLEWARE-*`).
+  - Workspace templates based on work type (e.g., "Bug", "Feature").
+  - Pre-defined repo sets for specific workspace patterns (e.g., `MIDDLEWARE-*`).
 
 ## Phase 3: Bulk Operations
 **Goal**: Manage multiple repos simultaneously.
