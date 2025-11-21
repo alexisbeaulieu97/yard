@@ -1,4 +1,4 @@
-module github.com/alexisbeaulieu97/yard
+module github.com/alexisbeaulieu97/canopy
 
 go 1.24.0
 

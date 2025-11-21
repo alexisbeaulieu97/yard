@@ -6,7 +6,7 @@
 The system SHALL provide an interactive wizard for creating workspaces with step-by-step prompts and validation.
 
 #### Scenario: Launch wizard
-- **WHEN** user runs `yard workspace create` or `yard workspace new --wizard`
+- **WHEN** user runs `canopy workspace create` or `canopy workspace new --wizard`
 - **THEN** interactive TUI wizard launches
 - **AND** first step (workspace ID prompt) is displayed
 - **AND** keyboard shortcuts help is shown at bottom

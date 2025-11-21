@@ -45,7 +45,7 @@ canopy repo add https://github.com/myorg/frontend.git
 
 ### 4. Create Your First Workspace
 
-Create a workspace (e.g., `PROJ-123` for a ticket, or `feature-auth` for a feature) and include specific repos:
+Create a workspace (e.g., `PROJ-123` for a workspace, or `feature-auth` for a feature) and include specific repos:
 
 ```bash
 canopy workspace new PROJ-123 --repos backend,frontend
@@ -107,19 +107,9 @@ Edit `~/.canopy/config.yaml`:
 ```yaml
 projects_root: ~/projects
 workspaces_root: ~/workspaces
-workspace_naming: "{{.ID}}__{{.Slug}}"
 ```
 
 ### Advanced Configuration
-
-#### Workspace Naming
-
-You can customize how workspace directories are named using Go templates:
-
-```yaml
-workspace_naming: "{{.ID}}"           # Result: PROJ-123
-workspace_naming: "{{.ID}}-{{.Slug}}" # Result: PROJ-123-fix-bug
-```
 
 #### Auto-Repositories (Regex)
 

@@ -10,7 +10,7 @@ Currently, users must provide full Git URLs or configure regex patterns in confi
 - Reduce typing burden for workspace creation
 - Support repository metadata (default branch, tags, description)
 - Work seamlessly with existing URL-based workflows
-- Auto-register repositories when cloned via `yard repo add`
+- Auto-register repositories when cloned via `canopy repo add`
 
 ### Non-Goals
 - Auto-discover repos from Git hosting APIs (future enhancement)
@@ -21,7 +21,7 @@ Currently, users must provide full Git URLs or configure regex patterns in confi
 ## Decisions
 
 ### Decision 1: Registry File Format
-Use YAML format at `~/.yard/repos.yaml` for human readability and editability.
+Use YAML format at `~/.canopy/repos.yaml` for human readability and editability.
 
 ```yaml
 repos:
@@ -62,15 +62,15 @@ Resolution order for repository names:
 - Patterns remain useful for org-wide conventions
 
 ### Decision 3: Auto-Registration
-When `yard repo add <url>` clones a repository, automatically create a registry entry.
+When `canopy repo add <url>` clones a repository, automatically create a registry entry.
 
 **Behavior:**
 ```bash
-yard repo add https://github.com/myorg/backend-api
+canopy repo add https://github.com/myorg/backend-api
 # Output:
 # Cloning repository...
 # Registered as 'backend-api' in registry
-# Use: yard workspace new PROJ-123 --repos backend-api
+# Use: canopy workspace new PROJ-123 --repos backend-api
 ```
 
 **Rationale:**
@@ -140,7 +140,7 @@ type RepoRegistry struct {
 
 func LoadRegistry() (*RepoRegistry, error) {
     home, _ := os.UserHomeDir()
-    path := filepath.Join(home, ".yard", "repos.yaml")
+    path := filepath.Join(home, ".canopy", "repos.yaml")
 
     r := &RepoRegistry{path: path, Repos: make(map[string]RegistryEntry)}
 
@@ -185,14 +185,14 @@ func (s *Service) ResolveRepos(workspaceID string, requestedRepos []string) ([]d
         }
 
         // 4. Unknown
-        return nil, fmt.Errorf("unknown repository '%s'. Use 'yard repo register %s <url>' to add it", val, val)
+        return nil, fmt.Errorf("unknown repository '%s'. Use 'canopy repo register %s <url>' to add it", val, val)
     }
 }
 ```
 
 ### Phase 3: Commands
 ```go
-// cmd/yard/repo.go
+// cmd/canopy/repo.go
 var repoRegisterCmd = &cobra.Command{
     Use:   "register <alias> <url>",
     Short: "Register a repository alias",
@@ -243,4 +243,4 @@ A: Not in v1. Add as future enhancement if users request it. Implementation woul
 A: Future enhancement. Would scan `[url "..."]` sections for common patterns. Not MVP.
 
 **Q: How to handle registry entry removal when repo is deleted?**
-A: `yard repo remove` should ask "Remove from registry too? [Y/n]". Keep separate commands for flexibility.
+A: `canopy repo remove` should ask "Remove from registry too? [Y/n]". Keep separate commands for flexibility.

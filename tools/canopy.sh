@@ -1,14 +1,14 @@
 #!/bin/bash
 
-# yard shell wrapper
+# canopy shell wrapper
 # Source this script in your shell profile (e.g. .zshrc, .bashrc)
-# Usage: source /path/to/yard.sh
+# Usage: source /path/to/canopy.sh
 
-yard() {
-    # Resolve yard binary
-    local YARD_BIN="yard"
-    if [[ -x "./yard" ]]; then
-        YARD_BIN="./yard"
+canopy() {
+    # Resolve canopy binary
+    local CANOPY_BIN="canopy"
+    if [[ -x "./canopy" ]]; then
+        CANOPY_BIN="./canopy"
     fi
 
     # Check for "workspace new" or "tui" commands which might need cd
@@ -17,10 +17,10 @@ yard() {
         # We use a temporary file to capture stdout while letting stderr pass through
         tmp_out=$(mktemp)
         
-        if [ -f "./yard" ]; then
-            ./yard "$@" --print-path > "$tmp_out"
+        if [ -f "./canopy" ]; then
+            ./canopy "$@" --print-path > "$tmp_out"
         else
-            command yard "$@" --print-path > "$tmp_out"
+            command canopy "$@" --print-path > "$tmp_out"
         fi
         
         exit_code=$?
@@ -38,10 +38,10 @@ yard() {
         # Capture output to see if we need to cd
         tmp_out=$(mktemp)
         
-        if [ -f "./yard" ]; then
-            ./yard "$@" > "$tmp_out"
+        if [ -f "./canopy" ]; then
+            ./canopy "$@" > "$tmp_out"
         else
-            command yard "$@" > "$tmp_out"
+            command canopy "$@" > "$tmp_out"
         fi
         
         exit_code=$?
@@ -58,10 +58,10 @@ yard() {
         # Similar logic for TUI if it returns a path
         tmp_out=$(mktemp)
         
-        if [ -f "./yard" ]; then
-            ./yard "$@" --print-path > "$tmp_out"
+        if [ -f "./canopy" ]; then
+            ./canopy "$@" --print-path > "$tmp_out"
         else
-            command yard "$@" --print-path > "$tmp_out"
+            command canopy "$@" --print-path > "$tmp_out"
         fi
         
         exit_code=$?
@@ -74,10 +74,10 @@ yard() {
         fi
     else
         # Normal execution
-        if [ -f "./yard" ]; then
-            ./yard "$@"
+        if [ -f "./canopy" ]; then
+            ./canopy "$@"
         else
-            command yard "$@"
+            command canopy "$@"
         fi
     fi
 }

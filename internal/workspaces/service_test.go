@@ -5,10 +5,10 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/alexisbeaulieu97/yard/internal/config"
-	"github.com/alexisbeaulieu97/yard/internal/domain"
-	"github.com/alexisbeaulieu97/yard/internal/gitx"
-	"github.com/alexisbeaulieu97/yard/internal/workspace"
+	"github.com/alexisbeaulieu97/canopy/internal/config"
+	"github.com/alexisbeaulieu97/canopy/internal/domain"
+	"github.com/alexisbeaulieu97/canopy/internal/gitx"
+	"github.com/alexisbeaulieu97/canopy/internal/workspace"
 )
 
 func TestResolveRepos(t *testing.T) {
@@ -78,7 +78,7 @@ func TestResolveRepos(t *testing.T) {
 
 func TestCreateWorkspace(t *testing.T) {
 	// Setup temp dirs
-	tmpDir, err := os.MkdirTemp("", "yard-service-test")
+	tmpDir, err := os.MkdirTemp("", "canopy-service-test")
 	if err != nil {
 		t.Fatalf("failed to create temp dir: %v", err)
 	}
@@ -112,7 +112,7 @@ func TestCreateWorkspace(t *testing.T) {
 	// CreateWorkspace requires repos? No, it iterates over them.
 
 	// Test creating a workspace with NO repos
-	dirName, err := svc.CreateWorkspace("TEST-EMPTY", "", "", []domain.Repo{})
+	dirName, err := svc.CreateWorkspace("TEST-EMPTY", "", []domain.Repo{})
 	if err != nil {
 		t.Fatalf("CreateWorkspace failed: %v", err)
 	}

@@ -6,19 +6,19 @@
 The system SHALL support archiving workspaces to preserve metadata while removing active worktrees, and restoring them later.
 
 #### Scenario: Archive active workspace
-- **WHEN** user runs `yard workspace archive PROJ-123`
-- **THEN** workspace metadata is moved to ~/.yard/archives/
+- **WHEN** user runs `canopy workspace archive PROJ-123`
+- **THEN** workspace metadata is moved to ~/.canopy/archives/
 - **AND** all worktrees are removed from workspaces_root
 - **AND** canonical repositories remain untouched
 - **AND** workspace no longer appears in active list
 
 #### Scenario: List archived workspaces
-- **WHEN** user runs `yard workspace list --archived`
+- **WHEN** user runs `canopy workspace list --archived`
 - **THEN** system displays list of archived workspaces with archive dates
 - **AND** shows original repo list for each
 
 #### Scenario: Restore archived workspace
-- **WHEN** user runs `yard workspace restore PROJ-123`
+- **WHEN** user runs `canopy workspace restore PROJ-123`
 - **THEN** workspace directory is recreated in workspaces_root
 - **AND** worktrees are recreated from canonical repos on archived branch
 - **AND** workspace appears in active list again

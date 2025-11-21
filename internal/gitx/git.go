@@ -1,4 +1,4 @@
-// Package gitx wraps git operations used by yard.
+// Package gitx wraps git operations used by canopy.
 package gitx
 
 import (
@@ -43,7 +43,7 @@ func (g *GitEngine) EnsureCanonical(repoURL, repoName string) (*git.Repository, 
 	return r, nil
 }
 
-// CreateWorktree creates a worktree for a ticket branch
+// CreateWorktree creates a worktree for a workspace branch
 func (g *GitEngine) CreateWorktree(repoName, worktreePath, branchName string) error {
 	canonicalPath := filepath.Join(g.ProjectsRoot, repoName)
 

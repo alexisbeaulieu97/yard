@@ -262,7 +262,7 @@ func defaultRegistryPath() (string, error) {
 		return "", fmt.Errorf("failed to get user home dir: %w", err)
 	}
 
-	return filepath.Join(home, ".yard", "repos.yaml"), nil
+	return filepath.Join(home, ".canopy", "repos.yaml"), nil
 }
 
 func stripAlias(entry RegistryEntry) RegistryEntry {

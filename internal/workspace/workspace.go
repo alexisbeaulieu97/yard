@@ -9,7 +9,7 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/alexisbeaulieu97/yard/internal/domain"
+	"github.com/alexisbeaulieu97/canopy/internal/domain"
 )
 
 // Engine manages workspaces
@@ -23,7 +23,7 @@ func New(workspacesRoot string) *Engine {
 }
 
 // Create creates a new workspace directory and metadata
-func (e *Engine) Create(dirName, id, slug, branchName string, repos []domain.Repo) error {
+func (e *Engine) Create(dirName, id, branchName string, repos []domain.Repo) error {
 	safeDir, err := sanitizeDirName(dirName)
 	if err != nil {
 		return fmt.Errorf("invalid workspace directory: %w", err)
@@ -42,7 +42,6 @@ func (e *Engine) Create(dirName, id, slug, branchName string, repos []domain.Rep
 	// Create metadata file
 	workspace := domain.Workspace{
 		ID:         id,
-		Slug:       slug,
 		BranchName: branchName,
 		Repos:      repos,
 	}
@@ -116,12 +115,7 @@ func (e *Engine) tryLoadMetadata(dirPath string) (domain.Workspace, bool) {
 
 	f, err := os.Open(metaPath) //nolint:gosec // path is derived from workspace directory
 	if err != nil {
-		metaPath = filepath.Join(dirPath, "ticket.yaml")
-
-		f, err = os.Open(metaPath) //nolint:gosec // path is derived from workspace directory
-		if err != nil {
-			return domain.Workspace{}, false
-		}
+		return domain.Workspace{}, false
 	}
 
 	defer func() { _ = f.Close() }()
@@ -146,13 +140,7 @@ func (e *Engine) Load(dirName string) (*domain.Workspace, error) {
 
 	f, err := os.Open(metaPath) //nolint:gosec // path is derived from workspace directory
 	if err != nil {
-		// Try legacy ticket.yaml
-		metaPath = filepath.Join(path, "ticket.yaml")
-
-		f, err = os.Open(metaPath) //nolint:gosec // path is derived from workspace directory
-		if err != nil {
-			return nil, fmt.Errorf("failed to open workspace metadata: %w", err)
-		}
+		return nil, fmt.Errorf("failed to open workspace metadata: %w", err)
 	}
 
 	defer func() { _ = f.Close() }()

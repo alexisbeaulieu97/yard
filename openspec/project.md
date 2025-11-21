@@ -1,7 +1,7 @@
 # Project Context
 
 ## Purpose
-**Canopy** (binary `canopy`) is a workspace manager for engineers working across multiple repositories. It solves the problem of juggling multiple branches and repositories by creating isolated workspace directories containing git worktrees, while keeping canonical clones centralized. Common use cases include feature development, bug fixes, experiments, or ticket-based workflows (e.g., JIRA).
+**Canopy** (binary `canopy`) is a workspace manager for engineers working across multiple repositories. It solves the problem of juggling multiple branches and repositories by creating isolated workspace directories containing git worktrees, while keeping canonical clones centralized. Common use cases include feature development, bug fixes, experiments, or workspace-based workflows (e.g., JIRA).
 
 ## Tech Stack
 - **Language**: Go
@@ -21,7 +21,7 @@
 ### Architecture Patterns
 - **Hexagonal/Clean Architecture**:
     - `cmd/`: Entry points.
-    - `internal/domain/`: Core logic (Ticket, Repo entities).
+    - `internal/domain/`: Core logic (Workspace, Repo entities).
     - `internal/gitx/`: Git adapter.
     - `internal/workspace/`: Filesystem adapter.
     - `internal/config/`: Configuration adapter.

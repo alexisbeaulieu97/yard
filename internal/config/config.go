@@ -39,14 +39,14 @@ func Load() (*Config, error) {
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(".")
-	viper.AddConfigPath(filepath.Join(home, ".yard"))
-	viper.AddConfigPath(filepath.Join(home, ".config", "yardmaster"))
+	viper.AddConfigPath(filepath.Join(home, ".canopy"))
+	viper.AddConfigPath(filepath.Join(home, ".config", "canopy"))
 
-	viper.SetDefault("projects_root", filepath.Join(home, ".yard", "projects"))
-	viper.SetDefault("workspaces_root", filepath.Join(home, ".yard", "workspaces"))
+	viper.SetDefault("projects_root", filepath.Join(home, ".canopy", "projects"))
+	viper.SetDefault("workspaces_root", filepath.Join(home, ".canopy", "workspaces"))
 	viper.SetDefault("workspace_naming", "{{.ID}}")
 
-	viper.SetEnvPrefix("YARD")
+	viper.SetEnvPrefix("CANOPY")
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err != nil {

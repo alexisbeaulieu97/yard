@@ -73,7 +73,7 @@ formatters:
       extra-rules: true
     goimports:
       local-prefixes:
-        - github.com/alexisbeaulieu97/yard
+        - github.com/alexisbeaulieu97/canopy
 
 output:
   formats:

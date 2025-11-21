@@ -2,11 +2,11 @@
 package app
 
 import (
-	"github.com/alexisbeaulieu97/yard/internal/config"
-	"github.com/alexisbeaulieu97/yard/internal/gitx"
-	"github.com/alexisbeaulieu97/yard/internal/logging"
-	"github.com/alexisbeaulieu97/yard/internal/workspace"
-	"github.com/alexisbeaulieu97/yard/internal/workspaces"
+	"github.com/alexisbeaulieu97/canopy/internal/config"
+	"github.com/alexisbeaulieu97/canopy/internal/gitx"
+	"github.com/alexisbeaulieu97/canopy/internal/logging"
+	"github.com/alexisbeaulieu97/canopy/internal/workspace"
+	"github.com/alexisbeaulieu97/canopy/internal/workspaces"
 )
 
 // App holds shared services for CLI commands.

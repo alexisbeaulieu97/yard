@@ -8,7 +8,7 @@
 - [ ] 1.5 Add shell completion hints
 
 ## 2. Implement shell-init Command
-- [ ] 2.1 Create `yard shell-init` command in cmd/yard/
+- [ ] 2.1 Create `canopy shell-init` command in cmd/canopy/
 - [ ] 2.2 Detect shell from $SHELL environment variable
 - [ ] 2.3 Output appropriate shell-specific functions
 - [ ] 2.4 Add --shell flag for explicit shell selection (bash|zsh|fish)

@@ -78,7 +78,7 @@ App creation happens in PersistentPreRunE, not main(), to preserve current error
 
 **Rationale:**
 - Maintains current UX (user sees "config not found" rather than panic)
-- Allows `yard init` to run before config exists
+- Allows `canopy init` to run before config exists
 - Cobra's error handling already works well
 
 ### Decision 4: No Singleton Pattern
@@ -122,7 +122,7 @@ func New(debug bool) (*App, error) {
 
 ### Phase 2: Update Main
 ```go
-// cmd/yard/main.go
+// cmd/canopy/main.go
 func main() {
     if err := rootCmd.Execute(); err != nil {
         fmt.Fprintln(os.Stderr, err)
@@ -131,7 +131,7 @@ func main() {
 }
 
 var rootCmd = &cobra.Command{
-    Use: "yard",
+    Use: "canopy",
     PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
         app, err := app.New(debug)
         if err != nil {
@@ -145,7 +145,7 @@ var rootCmd = &cobra.Command{
 
 ### Phase 3: Update Commands
 ```go
-// cmd/yard/workspace.go
+// cmd/canopy/workspace.go
 func init() {
     rootCmd.AddCommand(buildWorkspaceCmd())
 }
@@ -181,7 +181,7 @@ Previously commands were defined inline; now they're built by functions. This is
 ## Migration Plan
 
 1. Create `internal/app/app.go` with tests
-2. Update `main.go` and verify `yard --version` still works
+2. Update `main.go` and verify `canopy --version` still works
 3. Migrate workspace commands one-by-one, running tests after each
 4. Migrate repo commands
 5. Migrate remaining commands

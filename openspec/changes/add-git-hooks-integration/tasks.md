@@ -21,7 +21,7 @@
 - [ ] 3.4 Continue workspace creation if hook installation fails (warn only)
 
 ## 4. Sync Hooks Command
-- [ ] 4.1 Implement `yard workspace sync-hooks <ID>` command
+- [ ] 4.1 Implement `canopy workspace sync-hooks <ID>` command
 - [ ] 4.2 Re-install all hooks for workspace repos
 - [ ] 4.3 Show summary of hooks installed per repo
 - [ ] 4.4 Add --dry-run flag to preview changes

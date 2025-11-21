@@ -17,7 +17,7 @@ func TestNewInitializesDependencies(t *testing.T) {
 	projectsRoot := filepath.Join(tempHome, "projects")
 	workspacesRoot := filepath.Join(tempHome, "workspaces")
 
-	configDir := filepath.Join(tempHome, ".yard")
+	configDir := filepath.Join(tempHome, ".canopy")
 	if err := os.MkdirAll(configDir, 0o755); err != nil {
 		t.Fatalf("failed to create config dir: %v", err)
 	}
