@@ -12,10 +12,20 @@ import (
 )
 
 func TestResolveRepos(t *testing.T) {
+	t.Parallel()
+
+	registry := config.RepoRegistry{
+		Repos: map[string]config.RegistryEntry{
+			"myorg/repo-a": {Alias: "myorg/repo-a", URL: "https://github.com/myorg/repo-a.git"},
+			"alias/repo":   {Alias: "alias/repo", URL: "https://github.com/org/repo.git"},
+		},
+	}
+
 	cfg := &config.Config{
+		Registry: &registry,
 		Defaults: config.Defaults{
 			WorkspacePatterns: []config.WorkspacePattern{
-				{Pattern: "^TEST-", Repos: []string{"repo-a"}},
+				{Pattern: "^TEST-", Repos: []string{"myorg/repo-a"}},
 			},
 		},
 	}
@@ -28,23 +38,41 @@ func TestResolveRepos(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveRepos failed: %v", err)
 	}
-	if len(repos) != 1 || repos[0].Name != "repo-a" {
-		t.Errorf("expected [repo-a], got %v", repos)
+
+	if len(repos) != 1 || repos[0].Name != "myorg/repo-a" {
+		t.Errorf("expected [myorg/repo-a], got %v", repos)
 	}
 
 	// Test case 2: Explicit repos
-	repos, err = svc.ResolveRepos("OTHER-123", []string{"repo-b", "https://github.com/org/repo-c.git"})
+	repos, err = svc.ResolveRepos("OTHER-123", []string{"myorg/repo-b", "https://github.com/org/repo-c.git"})
 	if err != nil {
 		t.Fatalf("ResolveRepos failed: %v", err)
 	}
+
 	if len(repos) != 2 {
-		t.Errorf("expected 2 repos, got %d", len(repos))
+		t.Fatalf("expected 2 repos, got %d", len(repos))
 	}
+
 	if repos[0].Name != "repo-b" {
 		t.Errorf("expected repo-b, got %s", repos[0].Name)
 	}
+
 	if repos[1].Name != "repo-c" {
 		t.Errorf("expected repo-c, got %s", repos[1].Name)
+	}
+
+	// URL should use alias when registry contains that URL.
+	repos, err = svc.ResolveRepos("OTHER-123", []string{"https://github.com/org/repo.git"})
+	if err != nil {
+		t.Fatalf("ResolveRepos failed: %v", err)
+	}
+
+	if len(repos) != 1 {
+		t.Fatalf("expected 1 repo, got %d", len(repos))
+	}
+
+	if repos[0].Name != "alias/repo" {
+		t.Errorf("expected alias/repo, got %s", repos[0].Name)
 	}
 }
 
@@ -54,12 +82,19 @@ func TestCreateWorkspace(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tmpDir)
+
+	t.Cleanup(func() { _ = os.RemoveAll(tmpDir) })
 
 	projectsRoot := filepath.Join(tmpDir, "projects")
 	workspacesRoot := filepath.Join(tmpDir, "workspaces")
-	os.MkdirAll(projectsRoot, 0755)
-	os.MkdirAll(workspacesRoot, 0755)
+
+	if err := os.MkdirAll(projectsRoot, 0o750); err != nil {
+		t.Fatalf("failed to create projects root: %v", err)
+	}
+
+	if err := os.MkdirAll(workspacesRoot, 0o750); err != nil {
+		t.Fatalf("failed to create workspaces root: %v", err)
+	}
 
 	cfg := &config.Config{
 		ProjectsRoot:    projectsRoot,
@@ -92,7 +127,39 @@ func TestCreateWorkspace(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to load workspace: %v", err)
 	}
+
 	if ws.ID != "TEST-EMPTY" {
 		t.Errorf("expected ID TEST-EMPTY, got %s", ws.ID)
+	}
+}
+
+func TestRepoNameFromURL(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name string
+		url  string
+		want string
+	}{
+		{name: "standard https", url: "https://github.com/org/repo.git", want: "repo"},
+		{name: "scp style", url: "git@github.com:org/repo.git", want: "repo"},
+		{name: "trailing slash", url: "https://github.com/org/repo/", want: "repo"},
+		{name: "multiple trailing slashes", url: "https://github.com/org/repo///", want: "repo"},
+		{name: "empty input", url: "", want: ""},
+		{name: "slash only", url: "///", want: ""},
+		{name: "file scheme", url: "file:///tmp/repo.git", want: "repo"},
+		{name: "ssh scheme", url: "ssh://git@example.com/org/repo.git", want: "repo"},
+		{name: "https with user info", url: "https://user:token@github.com/org/repo.git", want: "repo"},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			if got := repoNameFromURL(tt.url); got != tt.want {
+				t.Fatalf("repoNameFromURL(%q) = %q, want %q", tt.url, got, tt.want)
+			}
+		})
 	}
 }

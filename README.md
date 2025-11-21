@@ -1,12 +1,16 @@
-# Yardmaster
+# Canopy
 
-> Workspace-centric worktrees for humans who live in JIRA and git.
+> A bird's-eye view of your git workspaces
 
-Yardmaster (`yard`) is a CLI/TUI tool that manages per-ticket workspaces. It creates isolated directories for each workspace, containing git worktrees for all relevant repositories, while keeping canonical clones centralized.
+**Canopy** is a CLI/TUI tool that manages isolated workspaces for your development work. It creates dedicated directories for each workspace, containing git worktrees for all relevant repositories, while keeping canonical clones centralized.
+
+## The Metaphor
+
+Think of **Canopy** as your vantage point above the forest. Just as a canopy provides a bird's-eye view of the trees and branches below, this tool gives you an elevated perspective to see and organize all your git workspaces and branches. The TUI provides a literal canopy-level dashboard where you can survey your entire development landscape—multiple repositories (trees), their branches, and the workspaces where you tend them. You're not lost in the undergrowth; you're managing from above with clarity and control.
 
 ## Features
 
-- **Workspaces**: Create a dedicated folder for each ticket/task (e.g., `~/workspaces/PROJ-123`).
+- **Workspaces**: Create a dedicated folder for each workspace (e.g., `~/workspaces/feature-auth`, `~/workspaces/PROJ-123`).
 - **Git Worktrees**: Automatically create worktrees for multiple repos on the workspace branch.
 - **Centralized Storage**: Canonical repos are stored in `~/projects` (configurable) and never re-cloned.
 - **TUI**: Interactive terminal UI for managing workspaces.
@@ -17,7 +21,7 @@ Yardmaster (`yard`) is a CLI/TUI tool that manages per-ticket workspaces. It cre
 ### 1. Installation
 
 ```bash
-go install github.com/alexisbeaulieu97/yard/cmd/yard@latest
+go install github.com/alexisbeaulieu97/canopy/cmd/canopy@latest
 ```
 
 ### 2. Initialization
@@ -25,26 +29,26 @@ go install github.com/alexisbeaulieu97/yard/cmd/yard@latest
 Initialize the configuration file:
 
 ```bash
-yard init
+canopy init
 ```
 
-This creates `~/.yard/config.yaml` with default settings.
+This creates `~/.canopy/config.yaml` with default settings.
 
 ### 3. Add Repositories
 
 Add the repositories you work with frequently:
 
 ```bash
-yard repo add https://github.com/myorg/backend.git
-yard repo add https://github.com/myorg/frontend.git
+canopy repo add https://github.com/myorg/backend.git
+canopy repo add https://github.com/myorg/frontend.git
 ```
 
 ### 4. Create Your First Workspace
 
-Create a workspace for a ticket (e.g., `PROJ-123`) and include specific repos:
+Create a workspace (e.g., `PROJ-123` for a ticket, or `feature-auth` for a feature) and include specific repos:
 
 ```bash
-yard workspace new PROJ-123 --repos backend,frontend
+canopy workspace new PROJ-123 --repos backend,frontend
 ```
 
 This will:
@@ -56,29 +60,40 @@ This will:
 
 ### Workspaces
 
-- **Create**: `yard workspace new <ID> [flags]`
+- **Create**: `canopy workspace new <ID> [flags]`
   - `--repos`: Comma-separated list of repos.
   - `--branch`: Custom branch name (defaults to ID).
   - `--slug`: Optional slug for directory naming.
-- **List**: `yard workspace list`
-- **View**: `yard workspace view <ID>`
-- **Path**: `yard workspace path <ID>` (prints absolute path)
-- **Sync**: `yard workspace sync <ID>` (pulls all repos)
-- **Close**: `yard workspace close <ID>` (removes workspace and worktrees)
+- **List**: `canopy workspace list`
+- **View**: `canopy workspace view <ID>`
+- **Path**: `canopy workspace path <ID>` (prints absolute path)
+- **Sync**: `canopy workspace sync <ID>` (pulls all repos)
+- **Close**: `canopy workspace close <ID>` (removes workspace and worktrees)
 
 ### Repositories
 
-- **List**: `yard repo list`
-- **Add**: `yard repo add <URL>`
-- **Remove**: `yard repo remove <NAME>`
-- **Sync**: `yard repo sync <NAME>` (fetches updates)
+- **List**: `canopy repo list`
+- **Add**: `canopy repo add <URL>`
+- **Remove**: `canopy repo remove <NAME>`
+- **Sync**: `canopy repo sync <NAME>` (fetches updates)
+
+#### Repository Registry
+
+Use short aliases instead of full URLs:
+
+- **Register**: `canopy repo register <alias> <url> [--branch develop --description "..."] [--tags api,go]`
+- **Unregister**: `canopy repo unregister <alias>`
+- **List registry**: `canopy repo list-registry [--tags backend]`
+- **Show entry**: `canopy repo show <alias>`
+
+`canopy repo add` auto-registers a sensible alias (override with `--alias` or skip with `--no-register`).
 
 ### TUI
 
 Launch the interactive UI:
 
 ```bash
-yard tui
+canopy tui
 ```
 
 - **Enter**: View details / Open workspace (if shell integration active).
@@ -87,7 +102,7 @@ yard tui
 
 ## Configuration
 
-Edit `~/.yard/config.yaml`:
+Edit `~/.canopy/config.yaml`:
 
 ```yaml
 projects_root: ~/projects
@@ -118,4 +133,4 @@ workspace_patterns:
     repos: ["frontend", "ui-kit"]
 ```
 
-With this config, `yard workspace new BACK-456` will automatically include `backend` and `common-lib`.
+With this config, `canopy workspace new BACK-456` will automatically include `backend` and `common-lib`.
