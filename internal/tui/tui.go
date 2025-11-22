@@ -124,7 +124,7 @@ func NewModel(svc *workspaces.Service, printPath bool) Model {
 		return []key.Binding{
 			key.NewBinding(key.WithKeys("/"), key.WithHelp("/", "search")),
 			key.NewBinding(key.WithKeys("s"), key.WithHelp("s", "toggle stale")),
-			key.NewBinding(key.WithKeys("p"), key.WithHelp("p", "push all")),
+			key.NewBinding(key.WithKeys("p"), key.WithHelp("p", "push selected")),
 			key.NewBinding(key.WithKeys("o"), key.WithHelp("o", "open in editor")),
 		}
 	}
@@ -390,15 +390,20 @@ func (d workspaceDelegate) Render(w io.Writer, m list.Model, index int, listItem
 		)
 	}
 
-	_, _ = fmt.Fprintf(
+	if _, err := fmt.Fprintf(
 		w,
 		"%s %s %s %s\n",
 		cursor,
 		statusStyle.Render("● "+statusText),
 		title,
 		badges,
-	)
-	_, _ = fmt.Fprintf(w, "  %s\n", descStyle.Render(secondary))
+	); err != nil {
+		// Rendering errors can be safely ignored
+	}
+
+	if _, err := fmt.Fprintf(w, "  %s\n", descStyle.Render(secondary)); err != nil {
+		// Rendering errors can be safely ignored
+	}
 }
 
 func healthForWorkspace(item workspaceItem, staleThreshold int) (string, lipgloss.Style) {

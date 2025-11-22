@@ -332,6 +332,7 @@ func (s *Service) cachedWorkspaceUsage(root string) (int64, time.Time, error) {
 }
 
 // CalculateDiskUsage sums file sizes under the provided root and returns latest mtime.
+// Note: .git directories are skipped so LastModified reflects working tree activity.
 func (s *Service) CalculateDiskUsage(root string) (int64, time.Time, error) {
 	var (
 		total   int64
