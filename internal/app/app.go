@@ -23,6 +23,10 @@ func New(debug bool) (*App, error) {
 		return nil, err
 	}
 
+	if err := cfg.Validate(); err != nil {
+		return nil, err
+	}
+
 	logger := logging.New(debug)
 	gitEngine := gitx.New(cfg.ProjectsRoot)
 	wsEngine := workspace.New(cfg.WorkspacesRoot, cfg.ArchivesRoot)

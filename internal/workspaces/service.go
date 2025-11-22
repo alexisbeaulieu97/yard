@@ -249,6 +249,7 @@ func (s *Service) ArchiveWorkspace(workspaceID string, force bool) (*workspace.A
 	}
 
 	if err := s.wsEngine.Delete(dirName); err != nil {
+		_ = s.wsEngine.DeleteArchive(archived.Path)
 		return nil, fmt.Errorf("failed to remove workspace directory: %w", err)
 	}
 
@@ -420,6 +421,11 @@ func (s *Service) SwitchBranch(workspaceID, branchName string, create bool) erro
 
 // RestoreWorkspace recreates a workspace from the newest archive entry.
 func (s *Service) RestoreWorkspace(workspaceID string, force bool) error {
+	archive, err := s.wsEngine.LatestArchive(workspaceID)
+	if err != nil {
+		return err
+	}
+
 	if _, _, err := s.findWorkspace(workspaceID); err == nil {
 		if !force {
 			return fmt.Errorf("workspace %s already exists. Use --force to replace or choose a different ID", workspaceID)
@@ -428,11 +434,6 @@ func (s *Service) RestoreWorkspace(workspaceID string, force bool) error {
 		if err := s.CloseWorkspace(workspaceID, true); err != nil {
 			return fmt.Errorf("failed to remove existing workspace: %w", err)
 		}
-	}
-
-	archive, err := s.wsEngine.LatestArchive(workspaceID)
-	if err != nil {
-		return err
 	}
 
 	ws := archive.Metadata

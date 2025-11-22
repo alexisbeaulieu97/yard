@@ -274,24 +274,71 @@ func (e *Engine) Delete(workspaceID string) error {
 
 // LatestArchive returns the newest archived entry for the given workspace ID.
 func (e *Engine) LatestArchive(workspaceID string) (*ArchivedWorkspace, error) {
-	archives, err := e.ListArchived()
-	if err != nil {
-		return nil, err
+	if e.ArchivesRoot == "" {
+		return nil, fmt.Errorf("archives root is not configured")
 	}
 
-	for _, archive := range archives {
-		if archive.Metadata.ID == workspaceID || archive.DirName == workspaceID {
-			return &archive, nil
+	safeDir, err := sanitizeDirName(workspaceID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid workspace id: %w", err)
+	}
+
+	workspaceDir := filepath.Join(e.ArchivesRoot, safeDir)
+	entries, err := os.ReadDir(workspaceDir)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, fmt.Errorf("archived workspace %s not found", workspaceID)
+		}
+
+		return nil, fmt.Errorf("failed to read archives: %w", err)
+	}
+
+	var latest *ArchivedWorkspace
+
+	for _, entry := range entries {
+		if !entry.IsDir() {
+			continue
+		}
+
+		dirPath := filepath.Join(workspaceDir, entry.Name())
+
+		if w, ok := e.tryLoadMetadata(dirPath); ok {
+			candidate := &ArchivedWorkspace{
+				DirName:  safeDir,
+				Path:     dirPath,
+				Metadata: w,
+			}
+
+			if latest == nil || candidate.ArchivedAt().After(latest.ArchivedAt()) {
+				latest = candidate
+			}
 		}
 	}
 
-	return nil, fmt.Errorf("archived workspace %s not found", workspaceID)
+	if latest == nil {
+		return nil, fmt.Errorf("archived workspace %s not found", workspaceID)
+	}
+
+	return latest, nil
 }
 
 // DeleteArchive removes an archived workspace entry.
 func (e *Engine) DeleteArchive(path string) error {
 	if path == "" {
 		return fmt.Errorf("archive path is required")
+	}
+
+	if e.ArchivesRoot != "" {
+		absPath, err := filepath.Abs(path)
+		if err != nil {
+			return fmt.Errorf("failed to resolve archive path: %w", err)
+		}
+
+		root := filepath.Clean(e.ArchivesRoot)
+
+		if !strings.HasPrefix(absPath, root+string(os.PathSeparator)) && absPath != root {
+			return fmt.Errorf("archive path must be within archives root")
+		}
 	}
 
 	return os.RemoveAll(path)

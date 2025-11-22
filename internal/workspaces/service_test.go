@@ -317,6 +317,47 @@ func TestArchiveRestoreCycle(t *testing.T) {
 	}
 }
 
+func TestArchiveWorkspaceDirtyFailsWithoutForce(t *testing.T) {
+	deps := newTestService(t)
+
+	sourceRepo := filepath.Join(deps.projectsRoot, "source-dirty")
+	createRepoWithCommit(t, sourceRepo)
+
+	canonicalPath := filepath.Join(deps.projectsRoot, "sample-dirty")
+	runGit(t, "", "clone", "--bare", sourceRepo, canonicalPath)
+
+	repoURL := "file://" + sourceRepo
+
+	if _, err := deps.svc.CreateWorkspace("PROJ-2", "", []domain.Repo{{Name: "sample-dirty", URL: repoURL}}); err != nil {
+		t.Fatalf("failed to create workspace: %v", err)
+	}
+
+	worktreePath := filepath.Join(deps.workspacesRoot, "PROJ-2", "sample-dirty")
+	if err := os.WriteFile(filepath.Join(worktreePath, "WIP.txt"), []byte("dirty"), 0o644); err != nil {
+		t.Fatalf("failed to write dirty file: %v", err)
+	}
+
+	if _, err := deps.svc.ArchiveWorkspace("PROJ-2", false); err == nil {
+		t.Fatalf("expected archive to fail on dirty workspace")
+	}
+}
+
+func TestRestoreWorkspaceForceDoesNotDeleteWithoutArchive(t *testing.T) {
+	deps := newTestService(t)
+
+	if _, err := deps.svc.CreateWorkspace("PROJ-NO-ARCHIVE", "", []domain.Repo{}); err != nil {
+		t.Fatalf("failed to create workspace: %v", err)
+	}
+
+	if err := deps.svc.RestoreWorkspace("PROJ-NO-ARCHIVE", true); err == nil {
+		t.Fatalf("expected restore to fail without archive present")
+	}
+
+	if _, err := os.Stat(filepath.Join(deps.workspacesRoot, "PROJ-NO-ARCHIVE")); err != nil {
+		t.Fatalf("workspace should remain when restore fails: %v", err)
+	}
+}
+
 func mustMkdir(t *testing.T, path string) {
 	t.Helper()
 

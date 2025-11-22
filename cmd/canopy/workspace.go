@@ -85,18 +85,7 @@ var (
 				return err
 			}
 
-			archived, err := app.Service.ArchiveWorkspace(id, force)
-			if err != nil {
-				return err
-			}
-
-			if archived != nil && archived.Metadata.ArchivedAt != nil {
-				fmt.Printf("Archived workspace %s at %s\n", id, archived.Metadata.ArchivedAt.Format(time.RFC3339)) //nolint:forbidigo // user-facing CLI output
-			} else {
-				fmt.Printf("Archived workspace %s\n", id) //nolint:forbidigo // user-facing CLI output
-			}
-
-			return nil
+			return archiveAndPrint(app.Service, id, force)
 		},
 	}
 
@@ -211,54 +200,22 @@ var (
 
 			service := app.Service
 			configDefaultArchive := strings.EqualFold(app.Config.CloseDefault, "archive")
+			interactive := isInteractiveTerminal()
 
 			if archiveFlag {
-				archived, err := service.ArchiveWorkspace(id, force)
-				if err != nil {
-					return err
-				}
-
-				if archived != nil && archived.Metadata.ArchivedAt != nil {
-					fmt.Printf("Archived workspace %s at %s\n", id, archived.Metadata.ArchivedAt.Format(time.RFC3339)) //nolint:forbidigo // user-facing CLI output
-				} else {
-					fmt.Printf("Archived workspace %s\n", id) //nolint:forbidigo // user-facing CLI output
-				}
-
-				return nil
+				return archiveAndPrint(service, id, force)
 			}
 
 			if noArchiveFlag {
-				if err := service.CloseWorkspace(id, force); err != nil {
-					return err
-				}
-
-				fmt.Printf("Closed workspace %s\n", id) //nolint:forbidigo // user-facing CLI output
-				return nil
+				return closeAndPrint(service, id, force)
 			}
 
-			inputInfo, err := os.Stdin.Stat()
-			if err == nil && (inputInfo.Mode()&os.ModeCharDevice) == 0 {
+			if !interactive {
 				if configDefaultArchive {
-					archived, err := service.ArchiveWorkspace(id, force)
-					if err != nil {
-						return err
-					}
-
-					if archived != nil && archived.Metadata.ArchivedAt != nil {
-						fmt.Printf("Archived workspace %s at %s\n", id, archived.Metadata.ArchivedAt.Format(time.RFC3339)) //nolint:forbidigo // user-facing CLI output
-					} else {
-						fmt.Printf("Archived workspace %s\n", id) //nolint:forbidigo // user-facing CLI output
-					}
-
-					return nil
+					return archiveAndPrint(service, id, force)
 				}
 
-				if err := service.CloseWorkspace(id, force); err != nil {
-					return err
-				}
-
-				fmt.Printf("Closed workspace %s\n", id) //nolint:forbidigo // user-facing CLI output
-				return nil
+				return closeAndPrint(service, id, force)
 			}
 
 			reader := bufio.NewReader(os.Stdin)
@@ -271,56 +228,33 @@ var (
 
 			answer, err := reader.ReadString('\n')
 			if err != nil {
-				answer = "n"
-			}
-
-			answer = strings.TrimSpace(answer)
-
-			if answer == "" {
 				if configDefaultArchive {
-					archived, err := service.ArchiveWorkspace(id, force)
-					if err != nil {
-						return err
-					}
-
-					if archived != nil && archived.Metadata.ArchivedAt != nil {
-						fmt.Printf("Archived workspace %s at %s\n", id, archived.Metadata.ArchivedAt.Format(time.RFC3339)) //nolint:forbidigo // user-facing CLI output
-					} else {
-						fmt.Printf("Archived workspace %s\n", id) //nolint:forbidigo // user-facing CLI output
-					}
-
-					return nil
+					return archiveAndPrint(service, id, force)
 				}
 
-				if err := service.CloseWorkspace(id, force); err != nil {
-					return err
+				return closeAndPrint(service, id, force)
+			}
+
+			answer = strings.ToLower(strings.TrimSpace(answer))
+
+			switch answer {
+			case "y", "yes":
+				return archiveAndPrint(service, id, force)
+			case "n", "no":
+				return closeAndPrint(service, id, force)
+			case "":
+				if configDefaultArchive {
+					return archiveAndPrint(service, id, force)
 				}
 
-				fmt.Printf("Closed workspace %s\n", id) //nolint:forbidigo // user-facing CLI output
-				return nil
-			}
-
-			if strings.EqualFold(answer, "n") || strings.EqualFold(answer, "no") {
-				if err := service.CloseWorkspace(id, force); err != nil {
-					return err
+				return closeAndPrint(service, id, force)
+			default:
+				if configDefaultArchive {
+					return archiveAndPrint(service, id, force)
 				}
 
-				fmt.Printf("Closed workspace %s\n", id) //nolint:forbidigo // user-facing CLI output
-				return nil
+				return closeAndPrint(service, id, force)
 			}
-
-			archived, err := service.ArchiveWorkspace(id, force)
-			if err != nil {
-				return err
-			}
-
-			if archived != nil && archived.Metadata.ArchivedAt != nil {
-				fmt.Printf("Archived workspace %s at %s\n", id, archived.Metadata.ArchivedAt.Format(time.RFC3339)) //nolint:forbidigo // user-facing CLI output
-			} else {
-				fmt.Printf("Archived workspace %s\n", id) //nolint:forbidigo // user-facing CLI output
-			}
-
-			return nil
 		},
 	}
 
@@ -486,6 +420,48 @@ var (
 		},
 	}
 )
+
+func archiveAndPrint(service *workspaces.Service, id string, force bool) error {
+	archived, err := service.ArchiveWorkspace(id, force)
+	if err != nil {
+		return err
+	}
+
+	var archivedAt *time.Time
+	if archived != nil {
+		archivedAt = archived.Metadata.ArchivedAt
+	}
+
+	printArchived(id, archivedAt)
+	return nil
+}
+
+func closeAndPrint(service *workspaces.Service, id string, force bool) error {
+	if err := service.CloseWorkspace(id, force); err != nil {
+		return err
+	}
+
+	fmt.Printf("Closed workspace %s\n", id) //nolint:forbidigo // user-facing CLI output
+	return nil
+}
+
+func printArchived(id string, archivedAt *time.Time) {
+	if archivedAt != nil {
+		fmt.Printf("Archived workspace %s at %s\n", id, archivedAt.Format(time.RFC3339)) //nolint:forbidigo // user-facing CLI output
+		return
+	}
+
+	fmt.Printf("Archived workspace %s\n", id) //nolint:forbidigo // user-facing CLI output
+}
+
+func isInteractiveTerminal() bool {
+	info, err := os.Stdin.Stat()
+	if err != nil {
+		return false
+	}
+
+	return (info.Mode() & os.ModeCharDevice) != 0
+}
 
 func init() {
 	rootCmd.AddCommand(workspaceCmd)
