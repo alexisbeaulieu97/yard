@@ -276,6 +276,7 @@ func (s *Service) ListWorkspaces() ([]domain.Workspace, error) {
 	}
 
 	var workspaces []domain.Workspace
+
 	for dir, w := range workspaceMap {
 		wsPath := filepath.Join(s.config.WorkspacesRoot, dir)
 
@@ -307,11 +308,13 @@ func (s *Service) cachedWorkspaceUsage(root string) (int64, time.Time, error) {
 	const ttl = time.Minute
 
 	s.usageMu.Lock()
+
 	entry, ok := s.usageCache[root]
 	if ok && time.Since(entry.scannedAt) < ttl {
 		s.usageMu.Unlock()
 		return entry.usage, entry.lastMod, entry.err
 	}
+
 	s.usageMu.Unlock()
 
 	usage, latest, err := s.CalculateDiskUsage(root)
@@ -336,7 +339,7 @@ func (s *Service) CalculateDiskUsage(root string) (int64, time.Time, error) {
 		skipDir = map[string]struct{}{".git": {}}
 	)
 
-	err := filepath.WalkDir(root, func(path string, d fs.DirEntry, err error) error {
+	err := filepath.WalkDir(root, func(_ string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}

@@ -155,6 +155,7 @@ func (m Model) loadWorkspaces() tea.Msg {
 	}
 
 	items := make([]workspaceItem, 0, len(workspaces))
+
 	var totalUsage int64
 
 	for _, w := range workspaces {
@@ -185,7 +186,7 @@ func (m Model) loadWorkspaceStatus(id string) tea.Cmd {
 }
 
 // Update handles incoming Tea messages and state transitions.
-func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) { //nolint:gocyclo // message-driven switch covers multiple event types
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		if updated, cmd, handled := m.handleKey(msg.String()); handled {
@@ -193,10 +194,12 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	case tea.WindowSizeMsg:
 		m.list.SetWidth(msg.Width)
+
 		height := msg.Height - 4
 		if height < 8 {
 			height = msg.Height
 		}
+
 		m.list.SetHeight(height)
 	case workspaceListMsg:
 		m.totalDiskUsage = msg.totalUsage
@@ -208,6 +211,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 		m.list.SetItems(listItems)
+
 		if m.filterStale {
 			m.applyFilters()
 		}
@@ -221,6 +225,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case workspaceStatusMsg:
 		m.statusCache[msg.id] = msg.status
 		m.updateWorkspaceSummary(msg.id, msg.status, nil)
+
 		if m.detailView && m.selectedWS != nil && m.selectedWS.ID == msg.id {
 			m.wsStatus = msg.status
 		}
@@ -229,6 +234,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.err = msg.err
 	case pushResultMsg:
 		m.pushing = false
+
 		m.pushTarget = ""
 		if msg.err != nil {
 			m.err = msg.err
@@ -361,6 +367,7 @@ func (d workspaceDelegate) Render(w io.Writer, m list.Model, index int, listItem
 	statusText, statusStyle := healthForWorkspace(wsItem, d.staleThreshold)
 
 	titleStyle := d.styles.NormalTitle
+
 	descStyle := d.styles.NormalDesc
 	if index == m.Index() {
 		titleStyle = d.styles.SelectedTitle
@@ -383,7 +390,7 @@ func (d workspaceDelegate) Render(w io.Writer, m list.Model, index int, listItem
 		)
 	}
 
-	fmt.Fprintf(
+	_, _ = fmt.Fprintf(
 		w,
 		"%s %s %s %s\n",
 		cursor,
@@ -391,7 +398,7 @@ func (d workspaceDelegate) Render(w io.Writer, m list.Model, index int, listItem
 		title,
 		badges,
 	)
-	fmt.Fprintf(w, "  %s\n", descStyle.Render(secondary))
+	_, _ = fmt.Fprintf(w, "  %s\n", descStyle.Render(secondary))
 }
 
 func healthForWorkspace(item workspaceItem, staleThreshold int) (string, lipgloss.Style) {
@@ -416,11 +423,11 @@ func renderBadges(item workspaceItem, staleThreshold int) string {
 
 	var badges []string
 
-	dangerBadge := badgeStyle.Copy().
+	dangerBadge := badgeStyle.
 		BorderForeground(lipgloss.Color("#FF5555")).
 		Foreground(lipgloss.Color("#FF5555"))
 
-	warnBadge := badgeStyle.Copy().
+	warnBadge := badgeStyle.
 		BorderForeground(lipgloss.Color("#F1FA8C")).
 		Foreground(lipgloss.Color("#F1FA8C"))
 
@@ -460,6 +467,7 @@ func humanizeBytes(size int64) string {
 	}
 
 	value := float64(size) / float64(div)
+
 	units := []string{"KB", "MB", "GB", "TB"}
 	if exp >= len(units) {
 		exp = len(units) - 1
@@ -616,6 +624,7 @@ func (m Model) renderDetailView() string {
 		builder.WriteString("No status available.\n")
 	} else {
 		builder.WriteString("Repositories:\n")
+
 		for _, r := range m.wsStatus.Repos {
 			flags := []string{}
 
@@ -708,6 +717,7 @@ func (m Model) handleKey(key string) (Model, tea.Cmd, bool) {
 		if key == "ctrl+c" || key == "q" {
 			return m, tea.Quit, true
 		}
+
 		return m, nil, true
 	}
 
@@ -741,11 +751,13 @@ func (m Model) handleConfirmKey(key string) (Model, tea.Cmd, bool) {
 			}
 		case "push":
 			targetID := m.confirmingID
+
 			m.confirmingID = ""
 			if targetID != "" {
 				m.pushing = true
 				m.pushTarget = targetID
 				m.infoMessage = ""
+
 				return m, m.pushWorkspace(targetID), true
 			}
 		}
@@ -773,6 +785,7 @@ func (m Model) handleListKey(key string) (Model, tea.Cmd, bool) {
 	case "s":
 		m.filterStale = !m.filterStale
 		m.applyFilters()
+
 		return m, nil, true
 	case "p":
 		return m.handlePushConfirm()
@@ -799,6 +812,7 @@ func (m Model) handleEnter() (Model, tea.Cmd, bool) {
 		}
 
 		m.SelectedPath = path
+
 		return m, tea.Quit, true
 	}
 
